@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ServerConfigMapper">
+    <insert id="addServerConfig" parameterType="com.cmd.exchange.common.model.ServerConfig">
+
+        insert into t_server_config (server_type,server_inner_address,server_external_address,server_name,port) values
+        ( #{serverType},#{serverInnerAddress},#{serverExternalAddress},#{serverName},#{port})
+    </insert>
+
+    <delete id="delServerConfigById" parameterType="Integer">
+        delete from t_server_config where id=#{id}
+    </delete>
+
+    <update id="updateServerConfig" parameterType="com.cmd.exchange.common.model.ServerConfig">
+        update t_server_config set
+        <if test="serverType!=null and serverType!=''">
+            server_type =#{serverType},
+        </if>
+        <if test="serverInnerAddress !=null and serverInnerAddress!=''">
+            server_inner_address =#{serverInnerAddress},
+        </if>
+        <if test="serverExternalAddress !=null and serverExternalAddress !=''">
+            server_external_address =#{serverExternalAddress},
+        </if>
+        <if test="serverName !=null and serverName!=''">
+            server_name =#{serverName},
+        </if>
+        <if test="port !=null and port!=''">
+            port =#{port},
+        </if>
+        id =#{id}
+        where id =#{id}
+    </update>
+    <select id="serverConfigList" resultType="com.cmd.exchange.common.model.ServerConfig">
+        select * from t_server_config where 1=1
+    </select>
+
+    <select id="getServerConfigPage" resultType="com.cmd.exchange.common.model.ServerConfig">
+        select * from t_server_config where 1=1
+    </select>
+    <select id="getServerConfigById" resultType="com.cmd.exchange.common.model.ServerConfig">
+        select * from t_server_config where id=#{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserCoinMapper">
+
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+    <resultMap type="com.cmd.exchange.common.vo.UserCoinInfoVO" id="coin-info">
+    </resultMap>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserCoin" flushCache="true">
+        INSERT INTO t_user_coin(user_id, coin_name, bind_address)
+        VALUES (#{userId}, #{coinName}, #{bindAddress})
+    </insert>
+
+    <update id="updateUserCoinAddress" flushCache="true">
+        UPDATE t_user_coin SET bind_address=#{bindAddress} WHERE user_id=#{userId} AND coin_name=#{coinName}
+    </update>
+
+    <!-- mall扣积分业务 -->
+    <update id="changeUserDeductionIntegral" flushCache="true">
+
+        UPDATE t_user_coin set available_balance=available_balance - #{deductionIntegral}
+        where user_id=#{userId} and coin_name=#{coinName} and available_balance>=-#{deductionIntegral}
+
+    </update>
+
+
+    <select id="getUserCoinByUserIdAndCoinName" resultType="com.cmd.exchange.common.vo.UserCoinVO">
+        SELECT * FROM t_user_coin WHERE user_id=#{userId} AND coin_name=#{coinName}
+    </select>
+
+    <select id="lockUserCoinByUserIdAndCoinName" resultType="com.cmd.exchange.common.vo.UserCoinVO">
+        SELECT * FROM t_user_coin WHERE user_id=#{userId} AND coin_name=#{coinName} for update
+    </select>
+
+    <select id="getUserCoinByUserId" resultType="com.cmd.exchange.common.vo.UserCoinVO">
+        SELECT uc.*,cc.* FROM t_user_coin uc
+        LEFT JOIN t_coin_config cc
+        ON uc.coin_name = cc.coin_name
+        WHERE uc.user_id=#{userId}
+    </select>
+
+    <select id="getCoinConfigList" resultType="com.cmd.exchange.common.vo.UserCoinVO">
+        select c.name as coinName, cc.* from t_coin c
+        LEFT JOIN t_coin_config cc
+        ON c.name = cc.coin_name
+
+        where c.status=0
+        <if test="coinNameList != null and coinNameList.size > 0">
+            AND c.name not in
+            <foreach item="item" index="index" collection="coinNameList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+
+    <select id="getUserCoinByAddressAndCoinName" resultType="com.cmd.exchange.common.model.UserCoin">
+        SELECT * FROM t_user_coin WHERE bind_address=#{address} AND coin_name=#{coinName}
+    </select>
+
+    <select id="getUserCoinInfo" resultMap="coin-info">
+        select s.*,s.real_name realName,tugc.group_type groupType,tugc.group_name groupName from (
+        SELECT c.id as id,c.user_id as user_id,u.user_name as userName,u.real_name as real_name,c.coin_name as
+        coin_name,u.group_type groupType,
+        c.bind_address as bind_address,c.available_balance as available_balance,c.freeze_balance as freeze_balance,
+        c.receive_freeze_balance as receive_freeze_balance,c.vip_type as vip_type,c.status as status
+        FROM t_user_coin c,t_user u
+        WHERE u.id=c.user_id
+        <if test="realName !=null">
+            and u.real_name=#{realName}
+        </if>
+        <if test="userId !=null">
+            AND u.id = #{userId}
+        </if>
+        <if test="coinName !=null and coinName.length > 0">
+            AND c.coin_name=#{coinName}
+        </if>
+        <if test="groupType !=null and groupType!=''">
+            and u.group_type = #{groupType}
+
+        </if>
+        )s left join `t_user_group_config` tugc on tugc.`group_type` = s.groupType
+
+        <if test="column !=null">
+            <if test='column=="availableBalance"'>
+                order by s.available_balance
+                <if test="desc">desc</if>
+            </if>
+            <if test='column=="freezeBalance"'>
+                order by s.freeze_balance
+                <if test="desc">desc</if>
+            </if>
+        </if>
+
+    </select>
+
+
+    <!--根据币种名查询用户中所持有的冻结和未冻结的币的总数-->
+    <select id="getUserCoinAmountByCoinName" parameterType="String" resultType="java.math.BigDecimal">
+        select sum(tuc.available_balance+tuc.freeze_balance) from t_user_coin tuc INNER JOIN t_user tu where tu.id =
+        tuc.user_id and tuc.coin_name=#{coinName}
+        <if test="groupType!=null">
+            and tu.group_type=#{groupType}
+        </if>
+
+    </select>
+
+
+    <select id="getUserCoinInfoAll" resultMap="coin-info">
+        select s.*, s.real_name realName,tugc.group_type groupType,tugc.group_name groupName from (
+        SELECT c.id as id,c.user_id as user_id,u.user_name as userName,u.real_name as real_name,c.coin_name as
+        coin_name,u.group_type groupType,
+        c.bind_address as bind_address,c.available_balance as available_balance,c.freeze_balance as
+        freeze_balance,c.status as status
+        FROM t_user_coin c,t_user u
+        WHERE u.id=c.user_id
+        <if test="realName !=null">
+            and u.real_name=#{realName}
+        </if>
+        <if test="userId !=null">
+            AND u.id = #{userId}
+        </if>
+        <if test="coinName !=null and coinName.length > 0">
+            AND c.coin_name=#{coinName}
+        </if>
+        <if test="groupType !=null and groupType!=''">
+            and u.group_type = #{groupType}
+
+        </if>
+        )s left join `t_user_group_config` tugc on tugc.`group_type` = s.groupType
+
+        <if test="column !=null">
+            <if test='column=="availableBalance"'>
+                order by s.available_balance
+                <if test="desc">desc</if>
+            </if>
+            <if test='column=="freezeBalance"'>
+                order by s.freeze_balance
+                <if test="desc">desc</if>
+            </if>
+        </if>
+
+    </select>
+</mapper>

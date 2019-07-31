@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.16.20.71:3306/db_fission?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&useSSL=false
+    username: root
+    password: 'root'
+
+
+  redis:
+    host: 172.16.20.71
+    database: 0
+    port: 6379
+    password:
+    jedis.pool:
+      max-idle: 50
+      max-active: 200
+      max-wait: 1000
+
+
+sms:
+  url:
+  account:
+  passwd:
+
+task:
+  trade:
+    match-making-sleep: 1000  # 撮合完m没有单后休眠的时间，休眠后检查新的单
+    test:
+      generate: false #是否生成模拟交易数据
+      buy-user-id: 76
+      sell-user-id: 7
+      fake-trade-id: 24506 #生成tradeLog时引用的trade的id
+      provider: coinbase #访问huobi需要代理，所以默认配置从这里爬取
+
+email:
+  serverHost:
+
+#trade.stat.kline.interval: 500  # k线统计周期
+
+
+
+logging:
+  config: classpath:config/log/log.xml
+  file: ./logs/task.log
+
+########################### 融云 ###########################
+rongHub:
+  appKey: 8w7jv4qb8204y
+  appSecret: pAY7dOPTR3
+
+isget-from-huobi: false
+huobi-domain: https://api.huobi.br.com
+huobi-k-size: 300

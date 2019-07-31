@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ReceivedCoinMapper">
+
+    <resultMap type="com.cmd.exchange.common.vo.CoinTransferVo" id="coinTransfer">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <select id="getTransferList" resultMap="coinTransfer">
+        SELECT s.id,user_id,u.mobile,u.user_name as userName,
+        u.group_type as groupType,
+        u.real_name as realName,
+        s.address as targetAddress,
+        s.coin_name as coinName,
+        s.txid,
+        s.amount,
+        s.received_time,
+        s.fee,
+        s.status
+        from t_received_coin s
+        LEFT JOIN t_user u
+        ON s.user_id = u.id
+        where
+        1 = 1
+        <if test="userName != null">and u.user_name = #{userName}</if>
+        <if test="startTime != null">and s.received_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and s.received_time <![CDATA[ <= ]]> #{endTime}</if>
+        <if test="userId != null">
+            and s.user_id = #{userId}
+        </if>
+        <if test="coinName != null and coinName.length > 0">
+            and s.coin_name = #{coinName}
+        </if>
+        <if test="targetAddress != null">
+            and s.address = #{targetAddress}
+        </if>
+        <if test="realName != null">
+            and u.real_name = #{realName}
+        </if>
+        ORDER BY received_time DESC
+    </select>
+
+    <select id="getReceivedCoinListAllByTimeAndNumber" parameterType="Integer"
+            resultType="com.cmd.exchange.common.vo.CoinTransferVo">
+        SELECT s.id,user_id,u.mobile,u.user_name as userName,u.email,
+        s.address as targetAddress,
+        s.coin_name as coinName,
+        s.txid,
+        s.amount,
+        s.received_time,
+        s.fee
+        from t_received_coin s
+        LEFT JOIN t_user u
+        ON s.user_id = u.id
+        where left(txid, 6) != 'inner-'
+        and s.amount <![CDATA[ >= ]]>#{rollInNumber}
+        <if test="lastRefreshTime !=null and lastRefreshTime!=''">
+            and s.received_time<![CDATA[ >= ]]>  #{lastRefreshTime}
+        </if>
+        <if test="coinName!=null and coinName !=''">
+            and s.coin_name =#{coinName}
+        </if>
+    </select>
+
+    <select id="getgetReceivedTotalFee" resultType="java.math.BigDecimal">
+        SELECT SUM(fee)
+        from t_received_coin
+        where left(txid, 6) != 'inner-'
+        and s.received_time<![CDATA[ >= ]]>  #{lastRefreshTime}
+        and s.coin_name =#{coinName}
+    </select>
+</mapper>

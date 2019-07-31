@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserNodeRewardMapper">
+
+    <sql id="selectUserNodeReward">
+        <where>
+            1=1
+            <if test="nodeName != null and nodeName != ''">
+                and m.node_name = #{nodeName}
+            </if>
+            <if test="status and status gt 0">
+                and m.status = #{status}
+            </if>
+            <if test="id !=null and id gt 0">
+                and m.id = #{id}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getOneInfo" parameterType="com.cmd.exchange.common.model.UserNodeReward"
+            resultType="com.cmd.exchange.common.model.UserNodeReward">
+        SELECT * FROM t_user_node_reward as m
+
+        <include refid="selectUserNodeReward"/>
+
+        ORDER BY m.create_time DESC limit 0, 1
+    </select>
+
+    <select id="getInfo" parameterType="com.cmd.exchange.common.model.UserNodeReward"
+            resultType="com.cmd.exchange.common.model.UserNodeReward">
+        SELECT * FROM t_user_node_reward as m
+        <include refid="selectUserNodeReward"/>
+    </select>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserNodeReward">
+        INSERT INTO t_user_node_reward(node_name, syn_reward_time, reward_rate, status, create_time)
+        VALUES (#{nodeName}, #{synRewardTime}, #{rewardRate}, #{status}, NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.UserNodeReward">
+        UPDATE t_user_node_reward as m
+        <set>
+            <if test="nodeName != null and nodeName != ''">m.node_name = #{nodeName},</if>
+            <if test="synRewardTime != null ">m.syn_reward_time = #{synRewardTime},</if>
+            <if test="rewardRate != null ">m.reward_rate = #{rewardRate},</if>
+            <if test="status !=null and status gt 0">m.status = #{status},</if>
+            <if test="synSmartTime != null ">m.syn_smart_time = #{synSmartTime},</if>
+        </set>
+        <where>m.id = #{id}</where>
+    </update>
+
+</mapper>
+
+

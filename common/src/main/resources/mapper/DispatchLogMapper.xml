@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.DispatchLogMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.DispatchLog">
+        INSERT INTO t_dispatch_log(user_id, mobile, coin_name, amount, create_time, last_time)
+        VALUES (#{userId}, #{mobile}, #{coinName}, #{amount}, NOW(), NOW())
+    </insert>
+
+    <select id="getDispatchLog" resultType="com.cmd.exchange.common.model.DispatchLog">
+        SELECT * FROM t_dispatch_log
+        WHERE 1=1
+        <if test="userId !=null">
+            and user_id=#{userId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

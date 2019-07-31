@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.MarketMapper">
+
+    <resultMap type="com.cmd.exchange.common.model.Market" id="market">
+        <result column="closed" property="closed"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <!--添加广告-->
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Market">
+        INSERT INTO t_market
+        (name,coin_name,settlement_currency,`day_exchange_begin`,day_exchange_end,
+        max_increase,min_decrease,min_exchange_num, max_exchange_num,
+        fee_coin, fee_currency,closed, create_time, coin_url, max_currency)
+        VALUES
+        (#{name},#{coinName},#{settlementCurrency},#{dayExchangeBegin},#{dayExchangeEnd},
+        #{maxIncrease},#{minDecrease},#{minExchangeNum}, #{maxExchangeNum},
+        #{feeCoin}, #{feeCurrency},#{closed,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler}, NOW(),
+        #{coinUrl}, #{maxCurrency})
+    </insert>
+
+    <update id="updateMarket" parameterType="com.cmd.exchange.common.model.Market" flushCache="true">
+        UPDATE t_market
+        SET
+        <if test="name !=null and name.length >0">
+            name = #{name},
+        </if>
+        <if test="coinName != null and coinName.length > 0">
+            coin_name = #{coinName},
+        </if>
+        <if test="settlementCurrency != null and settlementCurrency.length > 0">
+            settlement_currency = #{settlementCurrency},
+        </if>
+        <if test="dayExchangeBegin != null">
+            day_exchange_begin = #{dayExchangeBegin},
+        </if>
+        <if test="dayExchangeEnd !=null">
+            day_exchange_end =#{dayExchangeEnd},
+        </if>
+        <if test="maxIncrease !=null">
+            max_increase =#{maxIncrease},
+        </if>
+        <if test="minDecrease !=null">
+            min_decrease =#{minDecrease},
+        </if>
+        <if test="minExchangeNum !=null">
+            min_exchange_num =#{minExchangeNum},
+        </if>
+        <if test="maxExchangeNum !=null">
+            max_exchange_num =#{maxExchangeNum},
+        </if>
+        <if test="feeCoin !=null">
+            fee_coin =#{feeCoin},
+        </if>
+        <if test="feeCurrency !=null">
+            fee_currency =#{feeCurrency},
+        </if>
+        <if test="closed !=null">
+            closed =#{closed,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        </if>
+        <if test="coinUrl!=null">
+            coin_url=#{coinUrl},
+        </if>
+        <if test="maxCurrency!=null">
+            max_currency=#{maxCurrency},
+        </if>
+
+        last_update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="getAllMarkets" resultMap="market">
+        select * from t_market
+    </select>
+
+    <!--查询广告列表-->
+    <select id="getMarketList" resultMap="market">
+        select * from t_market
+        where 1=1
+
+        <if test="name != null and name != ''">
+            and name like CONCAT('%',#{name},'%')
+        </if>
+
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getMarket" resultMap="market">
+        select * from t_market
+        where coin_name = #{coinName} and settlement_currency = #{settlementCurrency}
+    </select>
+
+    <update id="deleteMarket">
+        delete from t_market where id = #{marketId}
+    </update>
+
+    <select id="getMarketById" resultMap="market">
+        select * from t_market
+        where id = #{marketId}
+    </select>
+    <select id="getMarketBySettlement" resultMap="market">
+        select * from t_market where settlement_currency = #{settlementCurrency}
+    </select>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcKlineMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcKline" useGeneratedKeys="true" keyProperty="id"
+            flushCache="true">
+        INSERT INTO t_otc_kline(coin_name, legal_name, open_price, close_price, high_price, low_price)
+        VALUES (#{coinName},#{legalName},#{openPrice},#{closePrice},#{highPrice},#{lowPrice})
+    </insert>
+
+    <update id="updateApplicationKline" parameterType="com.cmd.exchange.common.model.OtcKline">
+        UPDATE t_otc_kline
+        SET
+        <if test="openPrice!=null">
+            open_price=#{openPrice},
+        </if>
+        <if test="closePrice!=null">
+            close_price=#{closePrice},
+        </if>
+        <if test="highPrice!=null">
+            high_price=#{highPrice},
+        </if>
+        <if test="lowPrice!=null">
+            low_price=#{lowPrice},
+        </if>
+        last_time=#{lastTime}
+        WHERE id=#{id}
+    </update>
+
+    <select id="getApplicationLastKline" resultType="com.cmd.exchange.common.model.OtcKline">
+        SELECT * FROM t_otc_kline
+        WHERE
+        1=1
+        <if test="coinName!=null">
+            AND coin_name=#{coinName}
+        </if>
+        <if test="legalName!=null">
+            AND legal_name=#{legalName}
+        </if>
+        <if test="date!=null">
+            AND create_time>#{date}
+        </if>
+        limit 0,1
+    </select>
+
+    <select id="getApplicationKline" resultType="com.cmd.exchange.common.model.OtcKline">
+        SELECT * FROM t_otc_kline
+        WHERE
+        1=1
+        <if test="coinName!=null">
+            coin_name=#{coinName}
+        </if>
+        <if test="legalName!=null">
+            legal_name=#{legalName}
+        </if>
+        ORDER BY last_time DESC
+    </select>
+
+</mapper>
+
+

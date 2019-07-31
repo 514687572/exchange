@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserAmountTransferredIntoLogMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserAmountTransferredIntoLog">
+        INSERT INTO t_user_amount_transferred_into_log(coin_name, user_id, mobile, amount_transferred_into, sign,
+        add_time,change_time)
+        VALUES (#{coinName}, #{userId}, #{mobile}, #{amountTransferredInto}, #{sign}, NOW(), #{changeTime})
+    </insert>
+
+</mapper>

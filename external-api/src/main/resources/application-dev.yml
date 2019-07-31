@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://172.16.20.71:3306/db_fission?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&useSSL=false
+    username: root
+    password: 'root'
+
+  redis:
+    host: 172.16.20.71
+    database: 0
+    port: 6379
+    password:
+    jedis.pool:
+      max-idle: 50
+      max-active: 200
+      max-wait: 1000
+
+sms:
+  url:
+  account:
+  passwd:
+
+external-api:
+  verify-sign: true #是否检查签名
+  verify-timestamp: false #是否检查时间戳
+  rate-limit:
+    max-counts: 10 #每秒最大请求书
+
+isget-from-huobi: false
+huobi-domain:
+huobi-k-size:

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TimeMonitoringMapper">
+
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.TimeMonitoring" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        INSERT INTO t_time_monitoring(monitoring_type, monitoring_name, num_minutes)
+        VALUES (#{monitoringType}, #{monitoringName}, #{numMinutes})
+    </insert>
+
+    <select id="getTimeMonitoringPageList" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TimeMonitoring">
+        select * from t_time_monitoring where 1=1
+
+    </select>
+
+    <select id="getTimeMonitoringList" parameterType="String" resultType="com.cmd.exchange.common.model.TimeMonitoring">
+        select * from t_time_monitoring where 1=1
+
+    </select>
+
+    <select id="getTimeMonitoringById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.TimeMonitoring">
+        select * from t_time_monitoring where id =#{id}
+    </select>
+
+    <select id="getTimeMonitoringByType" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TimeMonitoring">
+        select * from t_time_monitoring where monitoring_type =#{monitoringType}
+    </select>
+
+    <update id="updateTimeMonitoring" parameterType="com.cmd.exchange.common.model.TimeMonitoring" flushCache="true">
+        UPDATE t_time_monitoring set
+        <if test="monitoringName!=null and monitoringName!=''">
+            monitoring_name=#{monitoringName},
+        </if>
+        <if test="numMinutes!=null and numMinutes!=''">
+            num_minutes=#{numMinutes},
+        </if>
+        id = #{id}
+        WHERE id=#{id}
+
+    </update>
+
+
+    <delete id="delTimeMonitoring" parameterType="Integer">
+        delete from t_time_monitoring where id=#{id}
+    </delete>
+
+</mapper>

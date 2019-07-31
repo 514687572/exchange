@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CoinMapper">
+
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Coin">
+        INSERT INTO t_coin(`name`, symbol, category, display_name, display_name_all, image, icon, sort, status,
+        server_address, server_port, server_user, server_password, contract_address, coin_self_parameter,
+        received_freeze,
+        release_rate, release_rate_vip, max_day_rel_num, max_month_rel,
+        release_day_limit_rate,release_policy,sell_release_conf,sell_price_rate
+        )
+        VALUES (#{name}, #{symbol}, #{category}, #{displayName}, #{displayNameAll},#{image},#{icon},#{sort}, 0,
+        #{serverAddress}, #{serverPort}, #{serverUser}, #{serverPassword},#{contractAddress},#{coinSelfParameter},
+        #{receivedFreeze},
+        #{releaseRate}, #{releaseRateVip}, #{maxDayRelNum}, #{maxMonthRel},
+                #{releaseDayLimitRate},#{releasePolicy},#{sellReleaseConf},#{sellPriceRate})
+    </insert>
+
+    <update id="updateCoin" parameterType="com.cmd.exchange.common.model.Coin">
+        UPDATE t_coin
+        SET
+        <if test="name!=null">
+            `name`=#{name},
+        </if>
+        <if test="symbol!=null">
+            symbol=#{symbol},
+        </if>
+        <if test="category!=null">
+            category=#{category},
+        </if>
+        <if test="displayName!=null">
+            display_name=#{displayName},
+        </if>
+        <if test="displayNameAll!=null">
+            display_name_all=#{displayNameAll},
+        </if>
+        <if test="image!=null">
+            image=#{image},
+        </if>
+        <if test="icon!=null">
+            icon=#{icon},
+        </if>
+        <if test="sort!=null">
+            sort=#{sort},
+        </if>
+        <if test="status!=null">
+            status=#{status},
+        </if>
+        <if test="serverAddress!=null">
+            server_address=#{serverAddress},
+        </if>
+        <if test="serverPort!=null">
+            server_port=#{serverPort},
+        </if>
+        <if test="serverUser!=null">
+            server_user=#{serverUser},
+        </if>
+        <if test="serverPassword!=null">
+            server_password=#{serverPassword},
+        </if>
+        <if test="contractAddress!=null">
+            contract_address=#{contractAddress},
+        </if>
+        <if test="coinSelfParameter!=null">
+            coin_self_parameter=#{coinSelfParameter},
+        </if>
+        <if test="coinBase!=null">
+            coin_base =#{coinBase},
+        </if>
+        <if test="receivedFreeze!=null">
+            received_freeze =#{receivedFreeze},
+        </if>
+        <if test="releaseRate!=null">
+            release_rate =#{releaseRate},
+        </if>
+        <if test="releaseRateVip!=null">
+            release_rate_vip =#{releaseRateVip},
+        </if>
+        <if test="maxDayRelNum!=null">
+            max_day_rel_num =#{maxDayRelNum},
+        </if>
+        <if test="maxMonthRel!=null">
+            max_month_rel =#{maxMonthRel},
+        </if>
+        <if test="releaseDayLimitRate!=null">
+            release_day_limit_rate =#{releaseDayLimitRate},
+        </if>
+        <if test="releasePolicy!=null">
+            release_policy =#{releasePolicy},
+        </if>
+        <if test="sellReleaseConf!=null">
+            sell_release_conf =#{sellReleaseConf},
+        </if>
+        <if test="sellPriceRate!=null">
+            sell_price_rate =#{sellPriceRate},
+        </if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteCoin" parameterType="string">
+        DELETE FROM t_coin WHERE `name`=#{coinName}
+    </delete>
+
+    <select id="getCoinByName" resultType="com.cmd.exchange.common.model.Coin">
+        SELECT * FROM t_coin WHERE `name`=#{coinName}
+    </select>
+
+    <select id="getCoin" resultType="com.cmd.exchange.common.model.Coin">
+        SELECT * FROM t_coin
+    </select>
+    <select id="getCoinListByStatus" parameterType="Integer" resultType="com.cmd.exchange.common.model.Coin">
+        select * from t_coin where status =#{status}
+    </select>
+
+
+</mapper>

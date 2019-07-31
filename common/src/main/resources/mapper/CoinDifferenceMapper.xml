@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CoinDifferenceMapper">
+
+    <select id="getCoinDifferenceByName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CoinDifference">
+        select * from t_coin_difference where coin_name =#{coinName}
+    </select>
+
+    <select id="getCoinDifferenceList" resultType="com.cmd.exchange.common.model.CoinDifference">
+        select * from t_coin_difference where 1=1
+    </select>
+
+    <insert id="addCoinDifference" parameterType="com.cmd.exchange.common.model.CoinDifference">
+        insert into
+        t_coin_difference(coin_name,roll_in_total,tody_add_roll_in_total,user_balance_total,point_total,today_add_point_total,refresh_time)values
+        (#{coinName},#{rollInTotal},#{todyAddRollInTotal},#{userBalanceTotal},#{pointTotal},#{todayAddPointTotal},#{refreshTime})
+    </insert>
+    <update id="updateCoinDifferenceByName" parameterType="com.cmd.exchange.common.model.CoinDifference">
+        update t_coin_difference set
+        <if test="coinName!=null and coinName!=''">
+            coin_name =#{coinName},
+        </if>
+        <if test="rollInTotal!=null and rollInTotal!=''">
+            roll_in_total=#{rollInTotal},
+        </if>
+        <if test="todyAddRollInTotal !=null and todyAddRollInTotal!=''">
+            tody_add_roll_in_total =#{todyAddRollInTotal},
+        </if>
+        <if test="userBalanceTotal !=null and userBalanceTotal!=''">
+            user_balance_total =#{userBalanceTotal},
+        </if>
+
+        <if test="pointTotal !=null and pointTotal!=''">
+            point_total=#{pointTotal},
+        </if>
+        <if test="todayAddPointTotal !=null and refreshTime!=''">
+            today_add_point_total=#{todayAddPointTotal},
+        </if>
+        <if test="refreshTime!=null and refreshTime!=''">
+            refresh_time =#{refreshTime},
+        </if>
+        coin_name #{coinName}
+        where coin_name=#{coinName}
+    </update>
+
+</mapper>

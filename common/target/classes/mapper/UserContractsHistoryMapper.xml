@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cmd.exchange.common.mapper.UserContractsHistoryMapper" >
+  <resultMap id="BaseResultMap" type="com.cmd.exchange.common.model.UserContractsHistory" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="contracts_name" property="contractsName" jdbcType="VARCHAR" />
+    <result column="contracts_coin_name" property="contractsCoinName" jdbcType="VARCHAR" />
+    <result column="deposit_num" property="depositNum" jdbcType="DECIMAL" />
+    <result column="daily_output" property="dailyOutput" jdbcType="DECIMAL" />
+    <result column="consume" property="consume" jdbcType="DECIMAL" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="rtv_time" property="rtvTime" jdbcType="TIMESTAMP" />
+    <result column="cycle" property="cycle" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, user_id, contracts_name, contracts_coin_name, deposit_num, daily_output, consume, 
+    add_time, rtv_time, cycle
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cmd.exchange.common.model.UserContractsHistoryExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_user_contracts_history
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.cmd.exchange.common.model.UserContractsHistoryExample" >
+    delete from t_user_contracts_history
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cmd.exchange.common.model.UserContractsHistory" >
+    insert into t_user_contracts_history (id, user_id, contracts_name, 
+      contracts_coin_name, deposit_num, daily_output, 
+      consume, add_time, rtv_time, 
+      cycle)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{contractsName,jdbcType=VARCHAR}, 
+      #{contractsCoinName,jdbcType=VARCHAR}, #{depositNum,jdbcType=DECIMAL}, #{dailyOutput,jdbcType=DECIMAL}, 
+      #{consume,jdbcType=DECIMAL}, #{addTime,jdbcType=TIMESTAMP}, #{rtvTime,jdbcType=TIMESTAMP}, 
+      #{cycle,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cmd.exchange.common.model.UserContractsHistory" >
+    insert into t_user_contracts_history
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="contractsName != null" >
+        contracts_name,
+      </if>
+      <if test="contractsCoinName != null" >
+        contracts_coin_name,
+      </if>
+      <if test="depositNum != null" >
+        deposit_num,
+      </if>
+      <if test="dailyOutput != null" >
+        daily_output,
+      </if>
+      <if test="consume != null" >
+        consume,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+      <if test="rtvTime != null" >
+        rtv_time,
+      </if>
+      <if test="cycle != null" >
+        cycle,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="contractsName != null" >
+        #{contractsName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractsCoinName != null" >
+        #{contractsCoinName,jdbcType=VARCHAR},
+      </if>
+      <if test="depositNum != null" >
+        #{depositNum,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyOutput != null" >
+        #{dailyOutput,jdbcType=DECIMAL},
+      </if>
+      <if test="consume != null" >
+        #{consume,jdbcType=DECIMAL},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rtvTime != null" >
+        #{rtvTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cycle != null" >
+        #{cycle,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cmd.exchange.common.model.UserContractsHistoryExample" resultType="java.lang.Integer" >
+    select count(*) from t_user_contracts_history
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_user_contracts_history
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.contractsName != null" >
+        contracts_name = #{record.contractsName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractsCoinName != null" >
+        contracts_coin_name = #{record.contractsCoinName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.depositNum != null" >
+        deposit_num = #{record.depositNum,jdbcType=DECIMAL},
+      </if>
+      <if test="record.dailyOutput != null" >
+        daily_output = #{record.dailyOutput,jdbcType=DECIMAL},
+      </if>
+      <if test="record.consume != null" >
+        consume = #{record.consume,jdbcType=DECIMAL},
+      </if>
+      <if test="record.addTime != null" >
+        add_time = #{record.addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.rtvTime != null" >
+        rtv_time = #{record.rtvTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.cycle != null" >
+        cycle = #{record.cycle,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_user_contracts_history
+    set id = #{record.id,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      contracts_name = #{record.contractsName,jdbcType=VARCHAR},
+      contracts_coin_name = #{record.contractsCoinName,jdbcType=VARCHAR},
+      deposit_num = #{record.depositNum,jdbcType=DECIMAL},
+      daily_output = #{record.dailyOutput,jdbcType=DECIMAL},
+      consume = #{record.consume,jdbcType=DECIMAL},
+      add_time = #{record.addTime,jdbcType=TIMESTAMP},
+      rtv_time = #{record.rtvTime,jdbcType=TIMESTAMP},
+      cycle = #{record.cycle,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>

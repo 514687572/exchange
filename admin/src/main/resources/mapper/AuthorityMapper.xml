@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.admin.dao.AuthorityDao">
+    <!--注意： 如果本mapper使用了关联查询（比如join），则不能使用这个缓存实现-->
+    <cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/>
+    <!--获取权限列表-->
+    <select id="getAuthority" resultType="com.cmd.exchange.admin.model.AuthorityEntity">
+        select res_id AS resId,name from t_admin_resources
+        where res_level = #{resLevel}
+        <if test="preId != null">
+            and pre_id = #{preId};
+        </if>
+    </select>
+
+    <select id="getRoleByName" resultType="com.cmd.exchange.admin.model.RoleEntity">
+        select * from t_admin_role where name = #{name}
+    </select>
+
+    <!--添加角色-->
+    <insert id="addRole">
+        insert into t_admin_role(name,create_user_id,des,status) values(#{name},#{creator},#{des},1)
+    </insert>
+
+    <!--查询角色列表-->
+    <select id="getRoleList" resultType="com.cmd.exchange.admin.model.RoleEntity">
+        SELECT
+        r.role_id AS roleId,
+        r.name AS roleName,
+        r.create_time as createTime,
+        r.`status`
+        FROM t_admin_role r
+        WHERE r.status = 1
+    </select>
+
+    <!--角色编辑-->
+    <update id="updateRole">
+        UPDATE t_admin_role
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="des != null and des != ''">
+                des = #{des},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            last_up_time = NOW()
+        </set>
+        <where>
+            role_id = #{roleId}
+        </where>
+    </update>
+
+    <!--删除角色-->
+    <delete id="delRole">
+        delete from t_admin_role where role_id = #{roleId}
+    </delete>
+
+    <!--添加角色与资源关系-->
+    <insert id="addRoleRes" parameterType="list">
+        INSERT INTO t_admin_role_res (role_id,res_id) VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{item.roleId},#{item.resId})
+        </foreach>
+    </insert>
+
+    <!--查询角色是否已存在关联的资源-->
+    <select id="getRoleResList" parameterType="int" resultType="com.cmd.exchange.admin.model.RoleResEntity">
+        select * from t_admin_role_res where role_id = #{roleId}
+    </select>
+
+    <select id="getAllRoleResList" parameterType="int" resultType="com.cmd.exchange.admin.model.RoleResEntity">
+        select * from t_admin_role_res where role_id
+    </select>
+
+    <select id="getResourceList" resultType="com.cmd.exchange.admin.model.AdminResourceEntity">
+        select res_id as id,name,pre_id as parentId from t_admin_resources
+    </select>
+
+    <!--删除角色与资源关系表-->
+    <delete id="delRoleRes" parameterType="int">
+        delete from t_admin_role_res where role_id = #{roleId}
+    </delete>
+
+    <!--添加用户与角色关系-->
+    <insert id="addAdminRole">
+        insert into t_admin_user_role (user_id,role_id) values(#{userId},#{roleId})
+    </insert>
+</mapper>

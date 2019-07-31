@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserLogMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <select id="getUserLog" resultType="com.cmd.exchange.common.model.UserLog">
+        SELECT * FROM t_user_log
+        WHERE user_id = #{userId}
+        <if test="array!=null and array.length>0">
+            AND `type` in
+            <foreach collection="array" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY operation_time DESC
+    </select>
+
+</mapper>

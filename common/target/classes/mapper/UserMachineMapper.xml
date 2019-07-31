@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserMachineMapper">
+
+    <sql id="selectUserMachine">
+        <where>
+            1=1
+            <if test="machineName != null and machineName != ''">
+                and m.machine_name = #{machineName}
+            </if>
+            <if test="yesterdayIncome !=null">
+                and m.yesterday_income = #{yesterdayIncome}
+            </if>
+            <if test="totalIncome !=null">
+                and m.total_income = #{totalIncome}
+            </if>
+            <if test="machineType !=null and machineType gt 0">
+                and m.machine_type = #{machineType}
+            </if>
+            <if test="userId !=null and userId gt 0">
+                and m.user_id = #{userId}
+            </if>
+            <if test="machineId !=null and machineId gt 0">
+                and m.machine_id = #{machineId}
+            </if>
+            <if test="machineStatus !=null and machineStatus gt 0">
+                and m.machine_status = #{machineStatus}
+            </if>
+            <if test="isOpen !=null and isOpen gt 0">
+                and m.is_open = #{isOpen}
+            </if>
+            <if test="machineCoin != null and machineCoin != ''">
+                and m.machine_coin = #{machineCoin}
+            </if>
+            <if test="yesterdayTime != null">
+                and m.yesterday_time >= #{yesterdayTime}
+            </if>
+            <if test="startLastTime != null">
+                and m.last_time >= #{startLastTime}
+            </if>
+            <if test="endLastTime != null">
+                and m.last_time &lt; #{endLastTime}
+            </if>
+
+            <if test="id !=null and id gt 0">
+                and m.id = #{id}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getOneInfo" parameterType="com.cmd.exchange.common.model.UserMachine"
+            resultType="com.cmd.exchange.common.model.UserMachine">
+        SELECT * FROM t_user_machine as m
+
+        <include refid="selectUserMachine"/>
+
+        ORDER BY m.create_time DESC limit 0, 1
+    </select>
+
+    <select id="getInfo" parameterType="com.cmd.exchange.common.model.UserMachine"
+            resultType="com.cmd.exchange.common.model.UserMachine">
+        SELECT * FROM t_user_machine as m
+        <include refid="selectUserMachine"/>
+    </select>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserMachine">
+        INSERT INTO t_user_machine(user_id, machine_id, yesterday_income, yesterday_time, machine_name,
+        machine_coin,machine_status,is_open,create_time)
+        VALUES (#{userId}, #{machineId}, #{yesterdayIncome}, #{yesterdayTime},
+        #{machineName},#{machineCoin},#{machineStatus},#{isOpen}, NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.UserMachine">
+        UPDATE t_user_machine as m
+        <set>
+            <if test="machineName != null and machineName != ''">m.machine_name = #{machineName},</if>
+            <if test="yesterdayIncome != null ">m.yesterday_income = #{yesterdayIncome},</if>
+            <if test="machineCoin != null and machineCoin != ''">m.machine_coin = #{machineCoin},</if>
+            <if test="machineStatus !=null and machineStatus gt 0">m.machine_status = #{machineStatus},</if>
+            <if test="isOpen !=null and isOpen gt 0">m.is_open = #{isOpen},</if>
+            <if test="yesterdayTime !=null">m.yesterday_time = #{yesterdayTime},</if>
+            m.last_time=NOW()
+        </set>
+        <include refid="selectUserMachine"/>
+    </update>
+    <update id="machineOpem" parameterType="com.cmd.exchange.common.model.UserMachine">
+        UPDATE t_user_machine as m
+        <set>
+
+            m.is_open = #{isOpen},
+
+            m.last_time=NOW()
+        </set>
+        <where>m.user_id = #{userId}</where>
+    </update>
+
+</mapper>
+
+

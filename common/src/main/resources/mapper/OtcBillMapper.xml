@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcBillMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcBill">
+        INSERT INTO t_otc_bill(user_id, coin_name, type, amount, fee, order_no)
+        VALUES (#{userId}, #{coinName}, #{type}, #{amount}, #{fee}, #{orderNo})
+    </insert>
+
+    <select id="getApplicationBillByUserId" resultType="com.cmd.exchange.common.model.OtcBill">
+        SELECT * FROM t_otc_bill
+        WHERE
+        userId=#{userId}
+        <if test="coinName!=null">AND coin_name=#{coinName}</if>
+        <if test="type!=null">AND type=#{type}</if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

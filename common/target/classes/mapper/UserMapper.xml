@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserMapper">
+
+
+    <insert id="addUserToken" parameterType="com.cmd.exchange.common.model.UserToken" flushCache="true">
+        INSERT INTO t_user_token(user_id, token, expire_time)
+        VALUES (#{userId},#{token},#{expireTime})
+    </insert>
+
+    <update id="updateUserToken" parameterType="com.cmd.exchange.common.model.UserToken" flushCache="true">
+        update t_user_token set token=#{token}, expire_time=#{expireTime} where user_id=#{userId}
+    </update>
+
+    <select id="getUserTokenByUserId" resultType="com.cmd.exchange.common.model.UserToken">
+        select * from t_user_token where user_id=#{userId} limit 0,1
+    </select>
+
+    <select id="getUserIdByInviteCode" resultType="java.lang.Integer">
+        select id from t_user where invite_code = #{inviteCode} limit 0,1
+    </select>
+
+    <select id="getUserTokenByToken" resultType="com.cmd.exchange.common.model.UserToken">
+
+        select * from t_user_token where token=#{token} limit 0,1
+    </select>
+
+    <update id="disableUserToken" flushCache="true">
+        update t_user_token set expire_time=#{expireTime} where user_id=#{userId}
+    </update>
+
+    <insert id="addUser" parameterType="com.cmd.exchange.common.model.User" flushCache="true">
+        insert into t_user(user_name, area_code, mobile, password,salt,invite_code, referrer, email)values(#{userName},
+        #{areaCode}, #{mobile}, #{password}, #{salt}, #{inviteCode}, #{referrer}, #{email})
+    </insert>
+
+    <select id="getUserByMobile" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user WHERE mobile=#{mobile}
+    </select>
+    <select id="getUserByMobileAndAreaCode" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user WHERE mobile=#{mobile} and area_code= #{areaCode}
+    </select>
+
+    <select id="getUserByUserName" resultType="com.cmd.exchange.common.model.User">
+        select * from t_user where user_name=#{userName} limit 0,1
+    </select>
+
+    <select id="getUserByRealName" resultType="com.cmd.exchange.common.model.User">
+        select * from t_user where real_name=#{realName} limit 0,1
+    </select>
+
+    <select id="getUserByUserId" resultType="com.cmd.exchange.common.model.User">
+        select * from t_user where id=#{userId} limit 0,1
+    </select>
+
+    <select id="getUserByEmail" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user WHERE email=#{email} limit 0,1
+    </select>
+
+    <select id="getUserByIDcard" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user WHERE id_card=#{idcard} limit 0,1
+    </select>
+
+    <select id="getUsersByIDcard" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user WHERE id_card=#{idcard} limit 0,#{maxCount}
+    </select>
+
+    <select id="getUserReferrerCount" resultType="int">
+        SELECT COUNT(1) as cnt FROM t_user WHERE referrer=#{userId}
+    </select>
+
+    <select id="getUserReferrerKYCCount" resultType="int">
+        SELECT COUNT(1) as cnt FROM t_user WHERE referrer=#{userId} and id_card_status = 1
+    </select>
+
+    <update id="updateUserByUserId" parameterType="com.cmd.exchange.common.model.User" flushCache="true">
+        UPDATE t_user
+        SET
+        <if test="password != null and password.length > 0">
+            password = #{password},
+        </if>
+
+        <if test="payPassword != null and payPassword.length > 0">
+            pay_password = #{payPassword},
+        </if>
+        <if test="salt!=null and salt.length > 0">
+            salt = #{salt},
+        </if>
+        <if test="paySalt!=null and paySalt.length > 0">
+            pay_salt=#{paySalt},
+        </if>
+        <if test="realName !=null and realName.length >0">
+            real_name = #{realName},
+        </if>
+        <if test="idCardType != null">
+            id_card_type = #{idCardType},
+        </if>
+        <if test="idCard != null and idCard.length > 0">
+            id_card = #{idCard},
+        </if>
+        <if test="idCardImg1 != null">
+            id_card_img1 = #{idCardImg1},
+        </if>
+        <if test="idCardImg2 !=null">
+            id_card_img2 =#{idCardImg2},
+        </if>
+        <if test="idCardImg3 !=null">
+            id_card_img3 =#{idCardImg3},
+        </if>
+        <if test="idCardInfo !=null">
+            id_card_info =#{idCardInfo},
+        </if>
+        <if test="registerIp!=null">
+            register_ip=#{registerIp},
+        </if>
+        <if test="lastLoginIp!=null">
+            last_login_ip=#{lastLoginIp},
+        </if>
+        <if test="lastLoginTime!=null">
+            last_login_time=#{lastLoginTime},
+        </if>
+        <if test="email!=null">
+            email=#{email},
+        </if>
+        <if test="status != null">
+            status=#{status},
+        </if>
+        <if test="areaCode != null">
+            area_code=#{areaCode},
+        </if>
+        <if test="mobile != null">
+            mobile=#{mobile},
+        </if>
+        <if test="realNameStatus != null">
+            real_name_status=#{realNameStatus},
+        </if>
+        <if test="groupType !=null">
+            group_type=#{groupType},
+        </if>
+        <if test="userType !=null">
+            user_type=#{userType},
+        </if>
+        <if test="referrer !=null">
+            referrer=#{referrer},
+        </if>
+        <if test="isPublishOtc !=null">
+            is_publish_otc=#{isPublishOtc},
+        </if>
+        <if test="idCardStatus != null">
+            id_card_status=#{idCardStatus},
+            id_card_time=NOW(),
+        </if>
+
+        update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserIdCard" parameterType="com.cmd.exchange.common.model.User" flushCache="true">
+        UPDATE t_user
+        SET
+        <if test="realName !=null and realName.length >0">
+            real_name = #{realName},
+        </if>
+        <if test="idCardType != null">
+            id_card_type = #{idCardType},
+        </if>
+        <if test="idCard != null and idCard.length > 0">
+            id_card = #{idCard},
+        </if>
+        <if test="idCardImg1 != null">
+            id_card_img1 = #{idCardImg1},
+        </if>
+        <if test="idCardImg2 !=null">
+            id_card_img2 =#{idCardImg2},
+        </if>
+        <if test="idCardImg3 !=null">
+            id_card_img3 =#{idCardImg3},
+        </if>
+        <if test="idCardInfo !=null">
+            id_card_info =#{idCardInfo},
+        </if>
+        id_card_time=NOW(),
+        id_card_status=2,
+        update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserLoginLogByUserId" flushCache="true">
+        UPDATE t_user
+        SET
+        <if test="lastLoginIp!=null and lastLoginIp.length>0">
+            last_login_ip=#{lastLoginIp},
+            last_login_time= NOW(),
+            login_times=login_times+1,
+        </if>
+        update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="getUserListByIdList" resultType="com.cmd.exchange.common.vo.UserInfoVO">
+        SELECT * FROM t_user
+        where id in
+        <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="adminGetUserByUserName" resultType="com.cmd.exchange.common.model.User">
+        SELECT * FROM t_user
+        where user_name in
+        <foreach item="item" collection="userName" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getUserList" resultType="com.cmd.exchange.common.vo.UserInfoVO">
+        SELECT t.*,tc.group_name,i.user_integration as integration FROM t_user t inner join t_user_group_config tc on tc.group_type=t.group_type
+        left join t_user_integration i on t.id=i.user_id
+        where 1=1
+        <if test="referrer !=null">
+            AND t.referrer =#{referrer}
+        </if>
+
+        <if test="mobile !=null">
+            AND t.mobile =#{mobile}
+        </if>
+
+        <if test="idCardStatus !=null">
+            AND t.id_card_status =#{idCardStatus}
+        </if>
+
+        <if test="status !=null">
+            AND t.status =#{status}
+        </if>
+        <if test="email !=null">
+            AND t.email = #{email}
+        </if>
+        <if test="groupType !=null">
+            and t.group_type = #{groupType}
+        </if>
+        <if test="realName !=null">
+            and t.real_name LIKE CONCAT(CONCAT('%',#{realName},'%'))
+        </if>
+        <if test="integrationMin !=null">
+            AND i.user_integration &gt;=#{integrationMin}
+        </if>
+        <if test="integrationMax !=null">
+            AND i.user_integration &lt;=#{integrationMax}
+        </if>
+        ORDER BY t.register_time DESC
+    </select>
+
+    <select id="getUserReferrer" resultType="com.cmd.exchange.common.vo.ReferrerVO">
+        SELECT mobile, email, register_time as registerTime, id_card_status as idCardStatus FROM t_user WHERE
+        referrer=#{userId}
+    </select>
+
+    <!--修改玩家的分组-->
+    <update id="updateGroupType" flushCache="true">
+        update t_user set group_type=#{groupType} where id=#{userId}
+    </update>
+
+    <select id="getUserListByGroupTypeCount" parameterType="String" resultType="java.lang.Integer">
+        SELECT count(*) from t_user where group_type=#{groupType}
+    </select>
+
+    <select id="getTopologyByUserId" parameterType="Integer" resultType="com.cmd.exchange.common.vo.TopologyVO">
+        select id userId, register_time registerTime,email userEmail,mobile mobile from t_user where referrer=#{userId}
+    </select>
+
+    <select id="getSubordinateBool" parameterType="Integer" resultType="Integer">
+        select count(*) from t_user where referrer=#{userId}
+    </select>
+
+    <select id="getUserGroupTypeName" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.UserGroupConfig">
+        select * from t_user_group_config where group_type = (
+        select group_type from t_user where id= #{id}
+        )
+
+    </select>
+
+    <select id="getAllUserIdNameByGroupType" resultType="com.cmd.exchange.common.model.User">
+        select * from t_user where group_type = #{groupType}
+    </select>
+
+    <select id="getRecUserCountByInviteCode" resultType="Integer">
+        select count(*) from t_user where referrer = #{referrer}
+    </select>
+
+    <select id="getRec2UserCountByInviteCode" resultType="Integer">
+        select count(*) from t_user where referrer in (select id from t_user where referrer = #{referrer})
+    </select>
+    <select id="getAvailableBalance" resultType="java.math.BigDecimal">
+        select tuc.available_balance
+        from t_user tu
+        left join t_user_coin tuc
+        on tu.id = tuc.user_id
+        WHERE tu.mobile = #{mobile}
+        and tuc.coin_name = #{coinName}
+    </select>
+
+    <select id="getAll" resultType="com.cmd.exchange.common.model.User">
+        select * from t_user order by id asc
+    </select>
+</mapper>

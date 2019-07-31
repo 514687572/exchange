@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.SuperMerchantOrderMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <resultMap type="com.cmd.exchange.common.model.SuperMerchantOrder" id="merchant-order">
+        <result column="type" property="type" typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="status" property="status" typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="bank_type" property="bankType"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <select id="lockOrder" resultMap="merchant-order">
+        select * from t_super_merchant_order where id=#{id} for UPDATE
+    </select>
+    <select id="getOrder" resultMap="merchant-order">
+        select * from t_super_merchant_order where id=#{id}
+    </select>
+
+    <insert id="addOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        t_super_merchant_order(`order_no`,`type`,`coin_name`,`merchant_id`,`super_merchant_id`,`amount`,`settlement_currency`,`price`,
+        `add_time`,`fee`,`status`,`bank_user`,`bank_name`,`bank_no`) VALUES (
+        #{orderNo},#{type.value},#{coinName},#{merchantId},#{superMerchantId},#{amount},#{settlementCurrency},#{price},
+        unix_timestamp(),#{fee},#{status.value},#{bankUser},#{bankName},#{bankNo} )
+    </insert>
+
+    <select id="getOrders" resultMap="merchant-order">
+        select * from t_super_merchant_order
+        where 1=1
+        <if test="merchantId != null">
+            and merchant_id=#{merchantId}
+        </if>
+        <if test="superMerchantId != null">
+            and super_merchant_id=#{superMerchantId}
+        </if>
+        <if test="status != null">
+            and status=#{status.value}
+        </if>
+        <if test="type != null">
+            and `type`=#{type.value}
+        </if>
+        <if test="orderNo != null and orderNo.length > 0">
+            and um.order_no=#{orderNo}
+        </if>
+        ORDER BY id DESC
+    </select>
+
+    <select id="getNextTimeoutOrder" resultMap="merchant-order">
+        select * from t_super_merchant_order
+        where (status=2 and unix_timestamp() - add_time > #{timeOut})
+        or (status=3 and unix_timestamp() - accept_time > #{timeOut})
+        and id > #{lastId}
+        ORDER BY id asc limit 0,1
+    </select>
+
+    <update id="cancelOrder">
+        UPDATE t_super_merchant_order SET
+        status=100,cancel_type=#{cancelType},cancel_comment=#{cancelComment},finish_time=unix_timestamp()
+        WHERE id=#{id}
+    </update>
+
+    <update id="acceptOrder">
+        UPDATE t_super_merchant_order SET status=3,accept_time=unix_timestamp()
+        WHERE id=#{id} and status=2
+    </update>
+
+    <update id="uploadVoucher">
+        UPDATE t_super_merchant_order SET
+        status=4,proof_time=unix_timestamp(),credential_urls=#{credentialUrls},credential_comment=#{credentialComment}
+        WHERE id=#{id} and status=3
+    </update>
+
+    <update id="completeOrder">
+        UPDATE t_super_merchant_order SET status=1,finish_time=unix_timestamp()
+        WHERE id=#{id}
+    </update>
+
+    <update id="appealOrder">
+        UPDATE t_super_merchant_order SET status=5
+        WHERE id=#{id}
+    </update>
+
+
+</mapper>

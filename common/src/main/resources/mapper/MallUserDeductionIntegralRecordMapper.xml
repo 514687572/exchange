@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.MallUserDeductionIntegralRecordMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.MallUserDeductionIntegralRecord">
+        INSERT INTO mall_user_deduction_integral_record(coin_name, user_id, mobile, deduction_integral, sign,
+        add_time,change_time,order_num)
+        VALUES (#{coinName}, #{userId}, #{mobile}, #{deductionIntegral}, #{sign}, NOW(), #{changeTime},#{orderNum})
+    </insert>
+
+    <select id="getByOrderNum" resultType="com.cmd.exchange.common.model.MallUserDeductionIntegralRecord">
+        SELECT * FROM mall_user_deduction_integral_record WHERE order_num = #{orderNum} limit 1
+    </select>
+</mapper>

@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cmd.exchange.common.mapper.AirdropMapper" >
+  <resultMap id="BaseResultMap" type="com.cmd.exchange.common.model.Airdrop" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="integration_min" property="integrationMin" jdbcType="DECIMAL" />
+    <result column="integration_max" property="integrationMax" jdbcType="DECIMAL" />
+    <result column="airdrop_num" property="airdropNum" jdbcType="DECIMAL" />
+    <result column="do_time" property="doTime" jdbcType="TIMESTAMP" />
+    <result column="user_num" property="userNum" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, user_id, create_time, update_time, type, status, integration_min, integration_max, 
+    airdrop_num, do_time, user_num
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cmd.exchange.common.model.AirdropExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_airdrop_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_airdrop_task
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_airdrop_task
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cmd.exchange.common.model.AirdropExample" >
+    delete from t_airdrop_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cmd.exchange.common.model.Airdrop" >
+    insert into t_airdrop_task (id, user_id, create_time, 
+      update_time, type, status, 
+      integration_min, integration_max, airdrop_num, 
+      do_time, user_num)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{integrationMin,jdbcType=DECIMAL}, #{integrationMax,jdbcType=DECIMAL}, #{airdropNum,jdbcType=DECIMAL}, 
+      #{doTime,jdbcType=TIMESTAMP}, #{userNum,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cmd.exchange.common.model.Airdrop" >
+    insert into t_airdrop_task
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="integrationMin != null" >
+        integration_min,
+      </if>
+      <if test="integrationMax != null" >
+        integration_max,
+      </if>
+      <if test="airdropNum != null" >
+        airdrop_num,
+      </if>
+      <if test="doTime != null" >
+        do_time,
+      </if>
+      <if test="userNum != null" >
+        user_num,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="integrationMin != null" >
+        #{integrationMin,jdbcType=DECIMAL},
+      </if>
+      <if test="integrationMax != null" >
+        #{integrationMax,jdbcType=DECIMAL},
+      </if>
+      <if test="airdropNum != null" >
+        #{airdropNum,jdbcType=DECIMAL},
+      </if>
+      <if test="doTime != null" >
+        #{doTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userNum != null" >
+        #{userNum,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cmd.exchange.common.model.AirdropExample" resultType="java.lang.Integer" >
+    select count(*) from t_airdrop_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_airdrop_task
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.integrationMin != null" >
+        integration_min = #{record.integrationMin,jdbcType=DECIMAL},
+      </if>
+      <if test="record.integrationMax != null" >
+        integration_max = #{record.integrationMax,jdbcType=DECIMAL},
+      </if>
+      <if test="record.airdropNum != null" >
+        airdrop_num = #{record.airdropNum,jdbcType=DECIMAL},
+      </if>
+      <if test="record.doTime != null" >
+        do_time = #{record.doTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.userNum != null" >
+        user_num = #{record.userNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_airdrop_task
+    set id = #{record.id,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      type = #{record.type,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      integration_min = #{record.integrationMin,jdbcType=DECIMAL},
+      integration_max = #{record.integrationMax,jdbcType=DECIMAL},
+      airdrop_num = #{record.airdropNum,jdbcType=DECIMAL},
+      do_time = #{record.doTime,jdbcType=TIMESTAMP},
+      user_num = #{record.userNum,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cmd.exchange.common.model.Airdrop" >
+    update t_airdrop_task
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="integrationMin != null" >
+        integration_min = #{integrationMin,jdbcType=DECIMAL},
+      </if>
+      <if test="integrationMax != null" >
+        integration_max = #{integrationMax,jdbcType=DECIMAL},
+      </if>
+      <if test="airdropNum != null" >
+        airdrop_num = #{airdropNum,jdbcType=DECIMAL},
+      </if>
+      <if test="doTime != null" >
+        do_time = #{doTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userNum != null" >
+        user_num = #{userNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cmd.exchange.common.model.Airdrop" >
+    update t_airdrop_task
+    set user_id = #{userId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      integration_min = #{integrationMin,jdbcType=DECIMAL},
+      integration_max = #{integrationMax,jdbcType=DECIMAL},
+      airdrop_num = #{airdropNum,jdbcType=DECIMAL},
+      do_time = #{doTime,jdbcType=TIMESTAMP},
+      user_num = #{userNum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <!--查询空投任务列表-->
+  <select id="getAirdropList" resultType="com.cmd.exchange.common.model.Airdrop">
+    select * from t_airdrop_task
+    ORDER BY update_time DESC,create_time DESC
+  </select>
+    <!--查询昨天的开启状态的空投任务列表-->
+   <select id="selectYesterdayAirdropList" resultType="com.cmd.exchange.common.vo.AirdropVO">
+    select a.*,b.name from t_airdrop_task a left join t_coin b on a.type=b.id
+    where TO_DAYS(now())-TO_DAYS(a.update_time)=1
+    and a.status=1
+    order by a.update_time asc
+  </select>
+</mapper>

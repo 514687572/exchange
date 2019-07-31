@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserRewardLogMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserRewardLog">
+        INSERT INTO t_user_reward_log(user_id, `from`, reason, coin_name, amount, comment, status)
+        VALUES (#{userId}, #{from}, #{reason}, #{coinName}, #{amount}, #{comment}, #{status})
+    </insert>
+
+    <update id="updateUserRewardLogStatus">
+        UPDATE t_user_reward_log SET status=#{status} WHERE user_id=#{userId} AND `from`=#{from}
+    </update>
+
+    <select id="getTotalUserReward" resultType="java.math.BigDecimal">
+        SELECT SUM(amount) FROM t_user_reward_log
+        WHERE
+        user_id=#{userId}
+        <if test="coinName!=null">AND coin_name=#{coinName}</if>
+        <if test="status!=null">AND status=#{status}</if>
+        <if test="reason!=null and reason.length>0">
+            AND reason IN
+            <foreach collection="reason" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getUserRewardByUserIdAndFrom" resultType="com.cmd.exchange.common.model.UserRewardLog">
+        SELECT * FROM t_user_reward_log
+        WHERE user_id=#{userId} AND `from`=#{from} AND status=0 limit 0, 1
+    </select>
+
+    <select id="getUserRegisterRewardByUserId" resultType="com.cmd.exchange.common.model.UserRewardLog">
+        SELECT * FROM t_user_reward_log
+        WHERE user_id=#{userId} and reason = 'Register' limit 0,1
+    </select>
+
+    <select id="getUserRewardList" resultType="com.cmd.exchange.common.model.UserRewardLog">
+        SELECT * FROM t_user_reward_log
+        WHERE
+        user_id=#{userId}
+        <if test="coinName!=null">AND coin_name=#{coinName}</if>
+        <if test="status!=null">AND status=#{status}</if>
+        <if test="reason!=null and reason.length>0">
+            AND reason IN
+            <foreach collection="reason" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getUserRewardLog" resultType="com.cmd.exchange.common.vo.RewardLogVO">
+        SELECT t2.mobile, t2.email, t1.coin_name as coinName, t1.amount, t1.comment, t1.last_time as lastTime FROM
+        t_user_reward_log t1
+        LEFT JOIN t_user t2 ON t1.from=t2.id
+        WHERE t1.user_id=#{userId} AND t1.reason='Referrer' AND t1.status=1 AND t1.`from` IS NOT NULL
+    </select>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.admin.dao.AdminDAO">
+    <!--注意： 如果本mapper使用了关联查询（比如join），则不能使用这个缓存实现-->
+    <cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/>
+
+    <resultMap type="com.cmd.exchange.admin.model.AdminEntity" id="admin">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <insert id="add" parameterType="com.cmd.exchange.admin.model.AdminEntity" flushCache="true" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO t_admin(id,user_name, password, salt ,remark,creator, position)
+        VALUES(#{id},#{userName}, #{password}, #{salt} ,#{remark},#{creator}, #{position})
+    </insert>
+
+    <update id="updatePassword" flushCache="true">
+        UPDATE t_admin SET password = #{password}, salt = #{salt}, lastTime = NOW() WHERE id = #{id}
+    </update>
+
+    <select id="getById" resultMap="admin">
+        SELECT * FROM t_admin WHERE id = #{id} limit 0,1
+    </select>
+
+    <update id="delete" parameterType="string">
+        DELETE FROM t_admin where id= #{userId}
+    </update>
+
+    <select id="getByAccount" parameterType="string" resultMap="admin">
+        SELECT * FROM t_admin WHERE user_name = #{userName} limit 0,1
+    </select>
+
+    <select id="getAdminTokenByToken" parameterType="string" resultType="com.cmd.exchange.admin.model.AdminToken">
+        SELECT * FROM t_admin_token WHERE token = #{token} limit 0,1
+    </select>
+
+    <insert id="addAdminToken" parameterType="com.cmd.exchange.admin.model.AdminToken" flushCache="true">
+        INSERT INTO t_admin_token(user_id, token, expire_time)
+        VALUES (#{userId},#{token},#{expireTime})
+    </insert>
+
+    <update id="updateAdminToken" parameterType="com.cmd.exchange.admin.model.AdminToken" flushCache="true">
+        update t_admin_token set token=#{token}, expire_time=#{expireTime} where user_id=#{userId}
+    </update>
+
+    <select id="getAdminTokenByUserId" resultType="com.cmd.exchange.admin.model.AdminToken">
+        select * from t_admin_token where user_id=#{userId} limit 0,1
+    </select>
+
+    <select id="getUserList" resultMap="admin">
+        select ta.*,tc.name,tb.role_id as roleId from t_admin ta
+        left join t_admin_user_role tb on ta.id = tb.user_id
+        left join t_admin_role tc on tc.role_id=tb.role_id
+        order by ta.createTime desc
+    </select>
+
+
+</mapper>

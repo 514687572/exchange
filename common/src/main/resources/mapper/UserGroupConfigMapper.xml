@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserGroupConfigMapper">
+
+    <update id="updateUserGroupConfigNameById" parameterType="com.cmd.exchange.common.model.UserGroupConfig"
+            flushCache="true">
+        update t_user_group_config set group_name=#{groupName} where id=#{id}
+    </update>
+    <update id="updateUserGroupConfigStatusById" parameterType="com.cmd.exchange.common.model.UserGroupConfig"
+            flushCache="true">
+        update t_user_group_config set status= #{status} where id=#{id}
+    </update>
+
+    <select id="getUserGroupConfigList" resultType="com.cmd.exchange.common.model.UserGroupConfig">
+        select * from t_user_group_config where 1=1
+    </select>
+
+    <select id="getUserGroupConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.UserGroupConfig">
+        select * from t_user_group_config where id=#{id}
+    </select>
+    <insert id="addUserGroupConfig" parameterType="com.cmd.exchange.common.model.UserGroupConfig"
+            useGeneratedKeys="true" keyProperty="id" flushCache="true">
+        INSERT INTO t_user_group_config(group_type, group_name, status)
+        VALUES (#{groupType},#{groupName},#{status})
+    </insert>
+
+    <delete id="delUserGroupConfigById" parameterType="Integer" flushCache="true">
+        delete from t_user_group_config where id=#{id}
+    </delete>
+</mapper>

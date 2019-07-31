@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TransferCoinConfigMapper">
+
+    <insert id="addTransferCoinConfig" parameterType="com.cmd.exchange.common.model.TransferCoinConfig">
+        insert into t_transfer_coin_config (coin_name,transfer_in_number,transfer_out_number,refresh_time) values
+        (#{coinName},#{transferInNumber},#{transferOutNumber},#{refreshTime})
+    </insert>
+
+    <delete id="delTransferCoinConfig" parameterType="Integer">
+        delete from t_transfer_coin_config where id = #{id}
+    </delete>
+
+    <select id="getTransferCoinConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.TransferCoinConfig">
+        select * from t_transfer_coin_config where id =#{id}
+    </select>
+
+    <select id="getTransferCoinConfigByCoinName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TransferCoinConfig">
+        select * from t_transfer_coin_config where coin_name =#{coinName}
+    </select>
+
+    <select id="getTransferCoinConfigList" resultType="com.cmd.exchange.common.model.TransferCoinConfig">
+        select * from t_transfer_coin_config where 1=1;
+    </select>
+
+    <select id="getTransferCoinConfigPage" resultType="com.cmd.exchange.common.model.TransferCoinConfig">
+        select * from t_transfer_coin_config where 1=1
+        <if test="coinName!=null and coinName!=''">
+            and coin_name=#{coinName}
+        </if>
+
+    </select>
+
+    <update id="updateTransferCoinConfig">
+        update t_transfer_coin_config set
+        <if test="coinName!=null and coinName!=''">
+            coin_name = #{coinName},
+        </if>
+        <if test="transferInNumber!=null and transferInNumber!=''">
+            transfer_in_number = #{transferInNumber},
+        </if>
+        <if test="transferOutNumber!=null and transferOutNumber!=''">
+            transfer_out_number = #{transferOutNumber},
+        </if>
+        <if test="refreshTime!=null and refreshTime!=''">
+            refresh_time =#{refreshTime},
+        </if>
+        id = #{id}
+        where id = #{id}
+
+    </update>
+
+</mapper>

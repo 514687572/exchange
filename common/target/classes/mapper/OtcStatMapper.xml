@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcStatMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcStat" useGeneratedKeys="true" keyProperty="id"
+            flushCache="true">
+        INSERT INTO t_otc_stat(user_id, coin_name, legal_name, amount_pass, amount_fail, trade_pass, trade_fail,
+        create_time, last_time)
+        VALUES (#{userId}, #{coinName}, #{legalName}, #{amountPass}, #{amountFail}, #{tradePass}, #{tradeFail}, NOW(),
+        NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.OtcStat">
+        UPDATE t_otc_stat
+        SET
+        <if test="amountPass!=null">amount_pass=#{amountPass},</if>
+        <if test="amountFail!=null">amount_fail=#{amountFail},</if>
+        <if test="tradePass!=null">trade_pass=#{tradePass},</if>
+        <if test="tradeFail!=null">trade_fail=#{tradeFail},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <select id="getOtcStat" resultType="com.cmd.exchange.common.model.OtcStat">
+        SELECT * FROM t_otc_stat
+        WHERE user_id=#{userId} AND coin_name=#{coinName}
+    </select>
+
+
+    <select id="statisticsTradeByUserId" resultType="com.cmd.exchange.common.model.OtcStat">
+        select
+        ifnull(a.amount_pass,0) amount_pass, ifnull(a.trade_pass,0) trade_pass,
+        ifnull(b.amount_fail,0) amount_fail, ifnull(b.trade_fail,0) trade_fail from
+        (select
+        sum(amount) amount_pass, count(0) trade_pass, 0 _index
+        from t_otc_order
+        where (deposit_user_id=#{userId} or withdrawal_user_id=#{userId})
+        and coin_name=#{coinName} and status = 1
+        and TO_DAYS(create_time) <![CDATA[>=]]> TO_DAYS(DATE_SUB(now(), INTERVAL 30 DAY))
+        ) a left join
+        (select sum(amount) amount_fail, count(0) trade_fail, 0 _index from t_otc_order
+        where (deposit_user_id=#{userId} or withdrawal_user_id=#{userId})
+        and coin_name=#{coinName} and status = 100
+        and TO_DAYS(create_time) <![CDATA[>=]]> TO_DAYS(DATE_SUB(now(), INTERVAL 30 DAY))
+        ) b on a._index = b._index
+    </select>
+
+</mapper>
+
+

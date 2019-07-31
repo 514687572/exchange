@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cmd.exchange.common.mapper.UserIntegrationMapper" >
+  <resultMap id="BaseResultMap" type="com.cmd.exchange.common.model.UserIntegration" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="user_integration" property="userIntegration" jdbcType="DECIMAL" />
+    <result column="integration_type" property="integrationType" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    user_id, user_integration, integration_type, add_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cmd.exchange.common.model.UserIntegrationExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_user_integration
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user_integration
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_user_integration
+    where user_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cmd.exchange.common.model.UserIntegrationExample" >
+    delete from t_user_integration
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cmd.exchange.common.model.UserIntegration" >
+    insert into t_user_integration (user_id, user_integration, integration_type, 
+      add_time)
+    values (#{userId,jdbcType=INTEGER}, #{userIntegration,jdbcType=DECIMAL}, #{integrationType,jdbcType=INTEGER}, 
+      #{addTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cmd.exchange.common.model.UserIntegration" >
+    insert into t_user_integration
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="userIntegration != null" >
+        user_integration,
+      </if>
+      <if test="integrationType != null" >
+        integration_type,
+      </if>
+      <if test="addTime != null" >
+        add_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userIntegration != null" >
+        #{userIntegration,jdbcType=DECIMAL},
+      </if>
+      <if test="integrationType != null" >
+        #{integrationType,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cmd.exchange.common.model.UserIntegrationExample" resultType="java.lang.Integer" >
+    select count(*) from t_user_integration
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_user_integration
+    <set >
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userIntegration != null" >
+        user_integration = #{record.userIntegration,jdbcType=DECIMAL},
+      </if>
+      <if test="record.integrationType != null" >
+        integration_type = #{record.integrationType,jdbcType=INTEGER},
+      </if>
+      <if test="record.addTime != null" >
+        add_time = #{record.addTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_user_integration
+    set user_id = #{record.userId,jdbcType=INTEGER},
+      user_integration = #{record.userIntegration,jdbcType=DECIMAL},
+      integration_type = #{record.integrationType,jdbcType=INTEGER},
+      add_time = #{record.addTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cmd.exchange.common.model.UserIntegration" >
+    update t_user_integration
+    <set >
+      <if test="userIntegration != null" >
+        user_integration = #{userIntegration,jdbcType=DECIMAL},
+      </if>
+      <if test="integrationType != null" >
+        integration_type = #{integrationType,jdbcType=INTEGER},
+      </if>
+      <if test="addTime != null" >
+        add_time = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cmd.exchange.common.model.UserIntegration" >
+    update t_user_integration
+    set user_integration = #{userIntegration,jdbcType=DECIMAL},
+      integration_type = #{integrationType,jdbcType=INTEGER},
+      add_time = #{addTime,jdbcType=TIMESTAMP}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+
+  <select id="getUserIntegrationByUserId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
+
+    select SUM(user_integration) from t_user_integration where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <!--批量插入-->
+  <insert id="insertByBatch" parameterType="java.util.List">
+    insert into t_user_integration (user_id, user_integration, integration_type, add_time)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.userId,jdbcType=INTEGER},#{item.userIntegration,jdbcType=DECIMAL},
+      #{item.integrationType,jdbcType=INTEGER},#{item.addTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
+  <!--获取批量用户的总积分-->
+  <select id="getBatchUserIntegration" resultType="com.cmd.exchange.common.model.UserIntegration">
+    select u.id as user_id,sum(i.user_integration) as user_integration from t_user u
+    left join t_user_integration i on u.id=i.user_id
+    group by u.id;
+  </select>
+</mapper>

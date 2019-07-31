@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TradeMapper">
+
+    <resultMap type="com.cmd.exchange.common.vo.TradeVo" id="trade">
+        <result column="type" property="type"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <!--添加交易-->
+    <insert id="addTrade" parameterType="com.cmd.exchange.common.vo.TradeVo" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_trade
+        (
+        user_id,coin_name,settlement_currency,price,amount,total_currency,type,price_type,add_time,status,sell_price
+        )
+        VALUES
+        (
+        #{userId},
+         #{coinName},
+         #{settlementCurrency},
+        #{price},
+         #{amount},
+         #{totalCurrency},
+        #{type,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        #{priceType},
+        UNIX_TIMESTAMP(),
+         0,
+         #{sellPrice}
+        )
+    </insert>
+
+    <select id="getOpenTradeList" resultType="com.cmd.exchange.common.vo.TradeVo">
+        SELECT price,
+        sum(amount - deal_coin) as amount,
+        sum(amount) as total_amount
+        FROM t_trade
+        WHERE
+
+        <if test="type !=null">
+            type =#{type}
+        </if>
+
+        and coin_name = #{coinName} and settlement_currency = #{settlementCurrency}
+        and status = 0
+        GROUP by price
+
+        <if test="type == 1">
+            ORDER by price DESC limit #{limit}
+        </if>
+        <if test="type == 2">
+            ORDER by price ASC limit #{limit}
+        </if>
+
+
+    </select>
+
+    <select id="getOpenMinTradeOne" resultType="com.cmd.exchange.common.vo.TradeVo">
+        SELECT
+            price
+        FROM t_trade
+        WHERE
+        type =#{type}
+        and coin_name = #{coinName} and settlement_currency = #{settlementCurrency}
+        and status = 0
+        ORDER by price ASC limit 1
+    </select>
+
+    <select id="getOpenTradeListByUser" resultMap="trade">
+        SELECT *, deal_coin as dealAmount
+        FROM t_trade
+        WHERE
+        1 = 1
+        <if test="coinName !=null and coinName.length > 0">
+            and coin_name = #{coinName}
+        </if>
+
+        <if test="settlementCurrency !=null and settlementCurrency.length > 0">
+            and settlement_currency = #{settlementCurrency}
+        </if>
+
+
+        and user_id = #{userId}
+        <if test="type !=null">
+            and type =#{type}
+        </if>
+
+        and status = 0
+        ORDER by id DESC
+    </select>
+
+    <select id="getTradeList" resultMap="trade">
+        SELECT t.*, deal_coin as dealAmount, u.mobile, u.real_name,u.user_name as userName
+        FROM t_trade t
+        LEFT JOIN t_user u
+        ON t.user_id = u.id
+        WHERE 1=1
+
+        <if test="coinName!=null and coinName!=''">
+            and coin_name = #{coinName}
+        </if>
+        <if test="settlementCurrency!=null and settlementCurrency!=''">
+            and settlement_currency = #{settlementCurrency}
+        </if>
+        <if test="price!=null and price !=''">
+            and t.price =#{price}
+        </if>
+        <if test="amount !=null and amount!=''">
+            and t.amount =#{amount}
+        </if>
+        <if test=" status !=null and status !=''">
+            t.status =#{status}
+        </if>
+        <if test="addStartTime!=null and addStartTime!=''">
+            and t.add_time  <![CDATA[ >= ]]> unix_timestamp(#{addStartTime})
+        </if>
+        <if test="addEndTime !=null and addEndTime!=''">
+            and t.add_time  <![CDATA[ <= ]]> unix_timestamp(#{addEndTime})
+        </if>
+        <if test="startLastTradeTime !=null and startLastTradeTime !=''">
+            and t.last_trade_time  <![CDATA[ >=]]> unix_timestamp(#{startLastTradeTime})
+        </if>
+
+        <if test="endLastTradeTime !=null and endLastTradeTime !=''">
+            and t.last_trade_time  <![CDATA[ <= ]]> unix_timestamp(#{endLastTradeTime})
+
+        </if>
+        <if test="type !=null">
+            and t.type =#{type}
+        </if>
+        <if test="mobile !=null">
+            and u.mobile =#{mobile}
+        </if>
+        <if test="userName !=null">
+            and u.user_name =#{userName}
+        </if>
+
+        ORDER by id DESC
+    </select>
+
+    <select id="getTradeHistoryListByUser" resultMap="trade">
+        SELECT *, deal_coin as dealAmount
+        FROM t_trade
+        WHERE
+        user_id = #{userId}
+        <if test="coinName !=null and coinName.length > 0">
+            and coin_name = #{coinName}
+        </if>
+        <if test="settlementCurrency !=null  and settlementCurrency.length > 0">
+            and settlement_currency = #{settlementCurrency}
+        </if>
+
+        <if test="type !=null">
+            and type =#{type}
+        </if>
+
+        and status in (1,2)
+
+        ORDER by id DESC
+    </select>
+
+    <select id="getAmountByTypeAndPrice" resultType="java.math.BigDecimal">
+        select sum(amount) from t_trade where 1=1
+        <if test="type != null">
+            and type =#{type}
+        </if>
+        <if test="price != null">
+            and price =#{price}
+        </if>
+    </select>
+
+    <select id="getHighestPriceSellTrade" resultType="java.math.BigDecimal">
+        select max(price) from t_trade where type = 2 and status = 0 and coin_name= #{coinName} and settlement_currency
+        = #{settlementCurrency}
+    </select>
+
+    <select id="getLowestPriceBuyTrade" resultType="java.math.BigDecimal">
+        select min(price) from t_trade where type = 1 and status = 0 and coin_name= #{coinName} and settlement_currency
+        = #{settlementCurrency}
+    </select>
+
+
+    <select id="getUserTradeByTimeConfig" resultType="com.cmd.exchange.common.vo.HFTradeVO">
+        select user_id userId,coin_name coinName,settlement_currency settlementCurrency,type,count(user_id) tradeNum ,
+        now() refreashTime from t_trade
+        where
+        add_time <![CDATA[ <= ]]> #{endTime} and add_time<![CDATA[ >= ]]> #{startTime} and coin_name=#{coinName} and
+        settlement_currency=#{settlementCurrency}
+
+        GROUP BY user_id,coin_name,settlement_currency,type
+    </select>
+
+    <select id="getTadeListByTotalCurrencyCount" resultType="Integer">
+        SELECT count(*)
+        FROM t_trade t
+        WHERE
+        t.status ="0"
+        and t.type = #{type}
+        and t.coin_name = #{coinName}
+        and t.settlement_currency = #{settlementCurrency}
+        and t.amount <![CDATA[ >= ]]> #{amount}
+        and t.user_id not in (
+        select user_id from t_trade_no_warning_user where no_warning_type="TIME_MONITORING_TRADE"
+        )
+    </select>
+
+    <select id="getTadeListByTotalCurrency" resultMap="trade">
+        select s.* from (
+        SELECT t.*, deal_coin as dealAmount, u.mobile, u.real_name,u.email,
+        u.user_name as userName
+        FROM t_trade t
+        LEFT JOIN t_user u
+        ON t.user_id = u.id
+        WHERE
+        t.status ="0"
+        and t.coin_name = #{coinName}
+        and t.settlement_currency = #{settlementCurrency}
+        and t.amount <![CDATA[ >= ]]> #{amount}
+        and t.user_id not in (
+        select user_id from t_trade_no_warning_user where no_warning_type="TIME_MONITORING_TRADE"
+        )
+        ) s where 1=1
+        <if test="type !=null">
+            and s.type =#{type}
+        </if>
+        <if test="mobile !=null">
+            and s.mobile =#{mobile}
+        </if>
+        <if test="email !=null">
+            and s.email = #{email}
+        </if>
+        <if test="userName !=null">
+            and s.user_name =#{userName}
+        </if>
+
+        ORDER by s.total_currency DESC
+
+    </select>
+
+
+    <select id="getTadeListByTotalAllCurrency" resultMap="trade">
+        select s.* from (
+        SELECT t.*, deal_coin as dealAmount, u.mobile, u.real_name,u.email,u.user_name
+        FROM t_trade t
+        LEFT JOIN t_user u
+        ON t.user_id = u.id
+        WHERE
+        t.status ="0"
+        and t.coin_name = #{coinName}
+        and t.settlement_currency = #{settlementCurrency}
+        and
+        (
+        (
+        t.amount <![CDATA[ >= ]]> #{buyAmount}
+        and t.type=1
+        )
+        or
+        (
+        t.amount  <![CDATA[ >= ]]>  #{sellAmount}
+        and t.type=2
+        )
+        )
+        and t.user_id not in (
+        select user_id from t_trade_no_warning_user where no_warning_type="TIME_MONITORING_TRADE"
+        )
+        ) s where 1=1
+
+        <if test="mobile !=null">
+            and s.mobile =#{mobile}
+        </if>
+        <if test="email !=null">
+            and s.email = #{email}
+        </if>
+        <if test="userName !=null">
+            and s.user_name =#{userName}
+        </if>
+
+        ORDER by s.total_currency DESC
+
+    </select>
+
+</mapper>

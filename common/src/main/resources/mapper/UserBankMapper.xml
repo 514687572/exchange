@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserBankMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.UserBank" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user_bank(user_id, `name`, bank_type, legal_name, bank_user, bank_name, bank_no, receipt_code,
+        status)
+        VALUES (#{userId},#{name},#{bankType},#{legalName},#{bankUser},#{bankName},#{bankNo},#{receiptCode},1)
+    </insert>
+
+    <update id="updateUserBank" parameterType="com.cmd.exchange.common.model.UserBank">
+        UPDATE t_user_bank
+        SET
+        <if test="name!=null and name.length>0">`name`=#{name},</if>
+        <if test="legalName!=null and legalName.length>0">legal_name=#{legalName},</if>
+        <if test="bankUser!=null and bankUser.length>0">bank_user=#{bankUser},</if>
+        <if test="bankName!=null and bankName.length>0">bank_name=#{bankName},</if>
+        <if test="bankNo!=null and bankNo.length>0">bank_no=#{bankNo},</if>
+        <if test="receiptCode!=null and receiptCode.length>0">receipt_code=#{receiptCode},</if>
+        <if test="status!=null">status=#{status},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <delete id="del">
+        DELETE FROM t_user_bank WHERE id=#{id}
+    </delete>
+
+    <select id="getUserBankById" resultType="com.cmd.exchange.common.model.UserBank">
+        SELECT * from t_user_bank WHERE id=#{id};
+    </select>
+
+    <select id="checkUserBankById" resultType="com.cmd.exchange.common.model.UserBank">
+        SELECT * from t_user_bank WHERE user_id=#{id} and status = 1;
+    </select>
+
+    <select id="getUserBankByUserId" resultType="com.cmd.exchange.common.model.UserBank">
+        SELECT * FROM t_user_bank
+        WHERE user_id=#{userId}
+        <if test="bankType!=null">
+            AND bank_type=#{bankType}
+        </if>
+        <if test="status!=null">
+            AND status=#{status}
+        </if>
+    </select>
+
+    <update id="updateUserBankByUserId">
+        UPDATE t_user_bank SET status=#{status}
+        WHERE user_id=#{userId}
+        <if test="bankType!=null">
+            AND bank_type=#{bankType}
+        </if>
+    </update>
+
+</mapper>

@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    #https://blog.csdn.net/qq631431929/article/details/51731834
+    url: jdbc:mysql://172.16.20.71:3306/db_fission?useLegacyDatetimeCode=false&useTimezone=true&serverTimezone=Hongkong&useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&useSSL=false
+    username: root
+    password: 'root'
+    #url: jdbc:mysql://127.0.0.1:3306/sz_exchange_db?useLegacyDatetimeCode=false&useTimezone=true&serverTimezone=Hongkong&useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&useSSL=false
+    #username: root
+    #password: 'root'
+
+  redis:
+    host: 172.16.20.71
+    database: 0
+    port: 6379
+    password:
+    jedis.pool:
+      max-idle: 50
+      max-active: 200
+      max-wait: 1000
+
+sms:
+  url:
+  account:
+  passwd:
+
+########################## log ##########################
+logging:
+  config: classpath:config/log/log.xml
+  file: ./logs/admin.log
+
+########################### 融云 ###########################
+rongHub:
+  appKey: 8w7jv4qb8204y
+  appSecret: pAY7dOPTR3
+
+isget-from-huobi: true
+huobi-domain: https://api.huobi.br.com
+huobi-k-size: 300

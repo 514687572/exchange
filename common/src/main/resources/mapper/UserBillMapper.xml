@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserBillMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <select id="getTotalUserBillReward" resultType="java.math.BigDecimal">
+        SELECT sum(change_amount) from t_user_bill
+        WHERE user_id=#{userId}
+        <if test="array!=null and array.length>0">
+            AND reason in
+            <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getUserBillReward" resultType="com.cmd.exchange.common.model.UserBill">
+        SELECT * FROM t_user_bill
+        WHERE user_id = #{userId}
+        <if test="array!=null and array.length>0">
+            AND reason in
+            <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND coin_name = #{coinName}
+        </if>
+        <if test="beginTime != null and beginTime.length>0"> and last_time <![CDATA[ >= ]]> #{beginTime}</if>
+        <if test="endTime != null and endTime.length>0"> and last_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY last_time DESC
+    </select>
+
+    <select id="getUserBills" resultType="com.cmd.exchange.common.vo.UserBillVO">
+        SELECT * from
+        t_user_bill
+        WHERE 1=1
+        <if test="userId!=null">
+            AND user_id = #{userId}
+        </if>
+        <if test="type!=null and type.length>0">
+            AND reason = #{type}
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND coin_name = #{coinName}
+        </if>
+        <if test="beginTime != null and beginTime.length>0">and last_time <![CDATA[ >= ]]> #{beginTime}</if>
+        <if test="endTime != null and endTime.length>0">and last_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY last_time DESC
+    </select>
+
+    <select id="getUserBills5" resultType="com.cmd.exchange.common.vo.UserBillVO">
+        SELECT * from
+        t_user_bill
+        WHERE 1=1
+        <if test="userId!=null">
+            AND user_id = #{userId}
+        </if>
+        <if test="reason!=null and reason.length>0">
+            AND reason = #{reason}
+        </if>
+        <if test="subType!=null">
+            AND sub_type = #{subType}
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND coin_name = #{coinName}
+        </if>
+        <if test="beginTime != null and beginTime.length>0">and last_time <![CDATA[ >= ]]> #{beginTime}</if>
+        <if test="endTime != null and endTime.length>0">and last_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY last_time DESC
+    </select>
+
+
+    <select id="getTotalByReasonAndTime" resultType="java.math.BigDecimal">
+        SELECT sum(change_amount) from t_user_bill
+        WHERE reason=#{reason} and last_time <![CDATA[ >= ]]> from_unixtime(#{begin}) and last_time <![CDATA[ < ]]>
+        from_unixtime(#{end})
+    </select>
+
+
+    <select id="getUserBillsByTime" resultType="com.cmd.exchange.common.vo.UserBillVO">
+        select tub.*,tu.user_name userName,tu.group_type groupType,tugc.group_name groupName,tu.real_name realName from
+        t_user_bill tub left join t_user tu on tu.id = tub.user_id
+        left join `t_user_group_config` tugc on tugc.group_type = tu.group_type
+        where 1=1
+        <if test="userId!=null">
+            AND tub.user_id = #{userId}
+        </if>
+        <if test="type!=null and type.length>0">
+            AND tub.type = #{type}
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND tub.coin_name = #{coinName}
+        </if>
+        <if test="subType !=null">
+            AND tub.sub_type =#{subType}
+        </if>
+        <if test="reason !=null">
+            AND tub.reason = #{reason}
+        </if>
+        <if test="groupType!=null and groupType!=''">
+            and tu.group_type= #{groupType}
+        </if>
+        <if test="realName!=null">
+            and tu.real_name= #{realName}
+        </if>
+        <if test="startTime != null and startTime !=''">and tub.last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null and endTime !=''">and tub.last_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY last_time DESC
+    </select>
+
+
+    <select id="getUserBillsPage" resultType="com.cmd.exchange.common.vo.UserBillVO">
+        select tub.* from t_user_bill tub where 1=1
+        <if test="userId!=null">
+            AND tub.user_id = #{userId}
+        </if>
+        <if test="type!=null and type.length>0">
+            AND tub.type = #{type}
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND tub.coin_name = #{coinName}
+        </if>
+        <if test="subType !=null">
+            AND tub.sub_type =#{subType}
+        </if>
+        <if test="reason !=null">
+            AND tub.reason = #{reason}
+        </if>
+
+        <if test="startTime != null and startTime !=''">and tub.last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null and endTime !=''">and tub.last_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY last_time DESC
+    </select>
+
+
+</mapper>

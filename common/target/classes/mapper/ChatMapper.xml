@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ChatMapper">
+
+    <select id="getChatInfoByUserId" resultType="com.cmd.exchange.common.model.ChatKey">
+        select * from t_user_chat_key where user_id = #{userId}
+    </select>
+
+    <insert id="addChatInfo" parameterType="com.cmd.exchange.common.model.ChatKey">
+        insert into t_user_chat_key (user_id, `key`) values (#{userId}, #{key})
+    </insert>
+
+    <insert id="insertChatLog" parameterType="com.cmd.exchange.common.rongHub.model.MessageModel">
+        insert into t_user_chat_log (
+        `from_user_id`,
+        `to_user_id`,
+        `object_name`,
+        `content`,
+        `extra`,
+        `channel_type`,
+        `msg_time_stamp`,
+        `msg_uid`,
+        `sensitive_type`,
+        `source`)
+        values (
+        #{record.fromUserId},
+        #{record.toUserId},
+        #{record.objectName},
+        #{record.content},
+        #{record.extra},
+        #{record.channelType},
+        #{record.msgTimestamp},
+        #{record.msgUID},
+        #{record.sensitiveType},
+        #{record.source}
+        )
+    </insert>
+
+    <select id="getChatLogByOrder" resultType="com.cmd.exchange.common.vo.ChatLogVo">
+        select * from
+        (select from_user_id sellId, to_user_id buyId, '2' role, object_name type, content, msg_time_stamp contactTime
+        from t_user_chat_log
+        where from_user_id = #{sellId} and to_user_id = #{buyId} and object_name != 'RC:SRSMsg'
+        and msg_time_stamp <![CDATA[>=]]> #{createTime}
+        union all
+        select to_user_id sellId, from_user_id buyId, '1' role, object_name type, content, msg_time_stamp contactTime
+        from t_user_chat_log
+        where from_user_id = #{buyId} and to_user_id = #{sellId} and object_name != 'RC:SRSMsg'
+        and msg_time_stamp <![CDATA[>=]]> #{createTime}) a
+        order by a.contactTime
+    </select>
+
+</mapper>

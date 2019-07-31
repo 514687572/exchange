@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.SendCoinMapper">
+
+    <resultMap type="com.cmd.exchange.common.model.SendCoin" id="sendCoin">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <resultMap type="com.cmd.exchange.common.vo.CoinTransferVo" id="coinTransfer">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.SendCoin">
+        INSERT INTO t_send_coin(user_id, received_user_id, address, coin_name, txid, amount, fee, send_time, status)
+        VALUES (#{userId}, #{receivedUserId}, #{address}, #{coinName}, #{txid}, #{amount}, #{fee}, NOW(),
+        #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler})
+    </insert>
+
+    <update id="updateTransferStatusById">
+        UPDATE t_send_coin
+        SET
+        <if test="status!=null">status=#{status},</if>
+        <if test="txid!=null">txid=#{txid},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateTransferSecondStatusById">
+        UPDATE t_send_coin
+        SET
+        <if test="secondStatus!=null">
+            second_status=#{secondStatus},
+        </if>
+        <if test="txid!=null">txid=#{txid},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+
+    <select id="getTransfer" resultMap="sendCoin">
+        SELECT s.*,u.user_name FROM t_send_coin s left join t_user u ON s.user_id = u.id
+        WHERE 1=1
+        <if test="userId!=null">AND user_id=#{userId}</if>
+        <if test="coinName !=null">AND coin_name=#{coinName}</if>
+        <if test="status!=null">AND s.status=#{status}</if>
+        order by last_time DESC
+    </select>
+
+    <select id="getTransferUnconfirm" resultMap="sendCoin">
+        SELECT * FROM t_send_coin WHERE received_user_id IS NULL AND status=1 AND id>#{id} limit 100
+    </select>
+
+    <select id="getTransferById" resultMap="sendCoin">
+        select * from t_send_coin WHERE id=#{id}
+    </select>
+
+    <select id="lockTransferById" resultMap="sendCoin">
+        SELECT * FROM t_send_coin WHERE id=#{id} for update
+    </select>
+
+    <select id="getTransferList" resultMap="coinTransfer">
+        SELECT s.id,user_id,u.mobile,u.user_name as userName,
+        u.real_name as realName,
+        u.group_type groupType,
+        tugf.`group_name` groupName,
+        s.address as targetAddress,
+        s.coin_name as coinName,
+        s.txid,
+        s.amount,
+        s.send_time as transferTime,
+        s.fee,
+        s.status
+        from t_send_coin s
+        LEFT JOIN t_user u
+        ON s.user_id = u.id
+        left join `t_user_group_config` tugf on u.group_type=tugf.group_type
+        where
+        1 = 1
+        <if test="userName != null">and u.user_name = #{userName}</if>
+        <if test="startTime != null">and s.send_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and s.send_time <![CDATA[ <= ]]> #{endTime}</if>
+        <if test="userId != null">
+            and s.user_id = #{userId}
+        </if>
+        <if test="coinName != null and coinName.length > 0">
+            and s.coin_name = #{coinName}
+        </if>
+        <if test="targetAddress != null and coinName.length > 0">
+            and s.address = #{targetAddress}
+        </if>
+        <if test="groupType!=null and groupType!=''">
+            and u.group_type =#{groupType}
+        </if>
+        <if test="realName !=null">
+            and u.real_name = #{realName}
+        </if>
+        ORDER BY send_time DESC
+    </select>
+
+    <select id="statUserTotalSendSuccessCoins" resultMap="sendCoin">
+        SELECT coin_name, sum(amount) as amount FROM t_send_coin WHERE user_id=#{userId} and txid!='-1' and left(txid,
+        6) != 'inner-' and status=1 group by coin_name
+    </select>
+
+    <select id="statTotalSendSuccessCoins" resultMap="sendCoin">
+        SELECT coin_name, sum(amount) as amount FROM t_send_coin WHERE txid!='-1' and left(txid, 6) != 'inner-' and
+        status=1 group by coin_name
+    </select>
+
+    <select id="getTransferByTime" resultMap="sendCoin">
+        SELECT s.*,u.user_name,u.group_type groupType,tugc.group_name groupName,u.real_name realName FROM t_send_coin s
+        left join t_user u ON s.user_id = u.id
+        left join `t_user_group_config` tugc on tugc.group_type = u.group_type
+        WHERE 1=1 and s.status = 0 and s.second_status = 0
+        <if test="userId!=null">AND user_id=#{userId}</if>
+        <if test="coinName !=null">AND coin_name=#{coinName}</if>
+        <if test="startTime != null and startTime !=''">and last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null and endTime !=''">and last_time <![CDATA[ <= ]]> #{endTime}</if>
+        <if test="groupType!=null and groupType!=''">
+            and tugc.group_type = #{groupType}
+        </if>
+        order by last_time DESC
+    </select>
+
+
+    <select id="getSecondTransferByTime" resultMap="sendCoin">
+        SELECT s.*,u.user_name,u.group_type groupType,tugc.group_name groupName,u.real_name realName FROM t_send_coin s
+        left join t_user u ON s.user_id = u.id
+        left join `t_user_group_config` tugc on tugc.group_type = u.group_type
+        WHERE 1=1 and s.status = 0 and s.second_status =1
+        <if test="userId!=null">AND user_id=#{userId}</if>
+        <if test="coinName !=null">AND coin_name=#{coinName}</if>
+        <if test="startTime != null and startTime !=''">and last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null and endTime !=''">and last_time <![CDATA[ <= ]]> #{endTime}</if>
+        <if test="groupType!=null and groupType!=''">
+            and tugc.group_type = #{groupType}
+        </if>
+        order by last_time DESC
+    </select>
+
+
+    <select id="getSendCoinListAllByTime" resultMap="coinTransfer">
+        select s.* from (
+        SELECT s.id,user_id,u.user_name as userName,
+        u.mobile,u.email,
+        s.address as targetAddress,
+        s.coin_name as coinName,
+        s.txid,
+        s.amount,
+        s.send_time as transferTime,
+        s.fee,
+        s.status
+
+        from t_send_coin s
+        LEFT JOIN t_user u
+        ON s.user_id = u.id
+        where left(txid, 6) != 'inner-'
+        or txid is null
+        and
+        s.coin_name =#{coinName}
+        )s
+        where s.amount <![CDATA[ >= ]]>#{rollOutNumber}
+        and unix_timestamp(s.transferTime) <![CDATA[ >= ]]> #{lastRefreshTime}
+    </select>
+
+</mapper>

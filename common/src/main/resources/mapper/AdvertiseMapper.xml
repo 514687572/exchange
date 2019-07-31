@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.AdMapper">
+
+    <resultMap type="com.cmd.exchange.common.vo.AdResVO" id="advertise">
+        <result column="type" property="type"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <!--添加广告-->
+    <insert id="add" parameterType="com.cmd.exchange.common.vo.AdResVO">
+        INSERT INTO t_advertise (name,createTime,start_time,end_time,locale,`status`,url,link,type,client_type,content)
+        VALUES(#{name},#{createTime},
+        #{startTime},#{endTime}, #{locale},
+        #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        #{url},
+        #{link}
+        ,#{type,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        #{clientType},
+        #{content})
+    </insert>
+
+
+    <!--查询广告列表-->
+    <select id="getADList" resultMap="advertise">
+        select * from t_advertise
+        where 1=1
+        <if test="startDate != null and startDate != ''">
+            and createTime <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and createTime <![CDATA[ <= ]]> #{endDate}
+        </if>
+        ORDER BY createTime DESC
+    </select>
+
+    <!--查询所有上线的广告列表-->
+    <select id="queryADList" resultMap="advertise">
+        select * from t_advertise
+        where status = 0
+        and locale = #{locale}
+        <if test="clientType != null">
+            and client_type = #{clientType}
+        </if>
+        and start_time <![CDATA[ < ]]> NOW()
+        and end_time <![CDATA[ >= ]]> NOW()
+    </select>
+
+
+    <!--查询广告列表长度-->
+    <select id="getADCount" resultType="int">
+        select count(1) from t_advertise
+        where 1=1
+        <if test="startDate != null and startDate != ''">
+            and end_time <![CDATA[ >= ]]> #{startDate}
+        </if>
+        <if test="endDate != null  and endDate != ''">
+            and end_time <![CDATA[ <= ]]> #{endDate}
+        </if>
+    </select>
+
+    <!--更新状态-->
+    <update id="updateStatus">
+        update t_advertise set status = #{status} where id = #{id}
+    </update>
+
+    <!--根据id查询广告信息-->
+    <select id="getAdById" parameterType="int" resultMap="advertise">
+        select * from t_advertise WHERE id = #{id}
+    </select>
+
+    <!--删除广告信息-->
+    <delete id="delById" parameterType="int">
+        delete from t_advertise where id = #{id}
+    </delete>
+
+    <!--更新广告信息-->
+    <update id="updateADInfo" parameterType="com.cmd.exchange.common.vo.AdResVO">
+        update t_advertise
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="status != null">
+                status = #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+            </if>
+            <if test="url != null">
+                url = #{url},
+            </if>
+            <if test="link != null">
+                link = #{link},
+            </if>
+            <if test="type != null">
+                type = #{type,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+            </if>
+            <if test="clientType != null">
+                client_type = #{clientType},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="locale != null">
+                locale = #{locale}
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+</mapper>

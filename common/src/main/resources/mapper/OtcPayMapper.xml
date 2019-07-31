@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcPayMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcPay" useGeneratedKeys="true" keyProperty="id"
+            flushCache="true">
+        INSERT INTO t_otc_pay(user_id, bank_type, bank_name, bank_user, bank_no, order_id, create_time)
+        VALUES (#{userId},#{bankType},#{bankName},#{bankUser},#{bankNo},#{orderId},NOW())
+    </insert>
+
+
+</mapper>
+
+

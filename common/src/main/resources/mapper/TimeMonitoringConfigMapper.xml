@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TimeMonitoringConfigMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.TimeMonitoringConfig" useGeneratedKeys="true"
+            keyProperty="id" flushCache="true">
+        INSERT INTO t_time_monitoring_config(monitoring_type,
+        num_minutes,coin_name,settlement_currency,buy_number,sell_number)
+        VALUES (#{monitoringType}, #{numMinutes},#{coinName},#{settlementCurrency},#{buyNumber},#{sellNumber})
+    </insert>
+
+    <select id="getTimeMonitoringConfigList" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TimeMonitoringConfig">
+        select * from t_time_monitoring_config where 1=1
+        <if test="monitoringType!=null and monitoringType!=''">
+            and monitoring_type = #{monitoringType}
+        </if>
+    </select>
+
+    <select id="getTimeMonitoringConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.TimeMonitoringConfig">
+        select * from t_time_monitoring_config where id =#{id}
+    </select>
+
+
+    <select id="getTimeMonitoringConfigByCoinNameAndSellName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TimeMonitoringConfig">
+        select * from t_time_monitoring_config where coin_name =#{coinName} and settlement_currency
+        =#{settlementCurrency}
+
+    </select>
+
+    <update id="updateTimeMonitoringConfigById" parameterType="com.cmd.exchange.common.model.TimeMonitoringConfig">
+        UPDATE t_time_monitoring_config set
+        <if test="numMinutes !=null and numMinutes!=''">
+            num_minutes=#{numMinutes},
+        </if>
+
+        <if test="buyNumber!=null and buyNumber!=''">
+            buy_number = #{buyNumber},
+        </if>
+        <if test="sellNumber!=null and sellNumber!=''">
+            sell_number = #{sellNumber},
+        </if>
+        <if test="monitoringType!=null and monitoringType!=''">
+            monitoring_type = #{monitoringType},
+        </if>
+        id =#{id}
+
+        WHERE id=#{id}
+    </update>
+
+
+    <delete id="delTimeMonitoringConfigById">
+        delete from t_time_monitoring_config where id=#{id}
+    </delete>
+
+    <select id="getTimeMonitoringConfigListAll" resultType="com.cmd.exchange.common.model.TimeMonitoringConfig">
+        select * from t_time_monitoring_config where 1=1
+    </select>
+</mapper>

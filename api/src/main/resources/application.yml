@@ -1,0 +1,50 @@
+## org.springframework.boot.autoconfigure.web.ServerProperties
+server:
+  port: 8192
+  #session.timeout: 2592000  # 单位: 秒. <= 30 * 24 * 60 * 60
+  tomcat:
+    uri-encoding: UTF-8
+    # 最大处理线程数
+    #maxThreads: 200
+    # 最小线程数
+    #minSpareThreads: 100
+    # 最大等待连接数，在并发访问数超过max-connections时会在等待队列里面排队，超过最大等待的连接数就会直接拒绝连接
+    #accept-count: 100
+
+
+
+##  https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+spring:
+  # http://stackoverflow.com/questions/28902374/spring-boot-rest-service-exception-handling/30193013#30193013
+  # 当找不到 handle 时. 默认会发起 response.sendError(404) --> DispatcherServlet.noHandlerFound()
+  # 配置下面两个值将会走到 ControllerAdvice 全局里面去
+  # org.springframework.boot.autoconfigure.web.WebMvcProperties
+  #  mvc.throw-exception-if-no-handler-found: false
+  # org.springframework.boot.autoconfigure.web.ResourceProperties
+  resources.add-mappings: true
+  profiles:
+    active: dev
+
+mybatis:
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:config/mybatis-config.xml
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  rowBoundsWithCount: true
+  offsetAsPageNum: true
+
+cmd:
+  market:
+    send-candlestick-interval: 3000 #发送k线的间隔
+    send-trade-interval: 1000 #发送k线的间隔
+  trade:
+    trade-timet-limit: 3000   # 用户2次交易之间的最短时间间隔，毫秒
+  invest:
+    invest-time-limit: 120000   # 每2分钟重新获取100条最新投资记录，毫秒
+
+isget-from-huobi: true
+huobi-domain: https://api.huobi.br.com
+huobi-k-size: 300

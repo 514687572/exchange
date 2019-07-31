@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.MerchantMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <resultMap type="com.cmd.exchange.common.vo.MerchantVo" id="merchant-vo">
+        <result column="bank_type" property="bankType"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+    <resultMap type="com.cmd.exchange.common.model.Merchant" id="merchant">
+        <result column="bank_type" property="bankType"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+    <resultMap type="com.cmd.exchange.common.model.MerchantCoinConf" id="merchant-coin-conf">
+    </resultMap>
+    <resultMap type="com.cmd.exchange.common.model.MerchantCoin" id="merchant-coin">
+    </resultMap>
+
+    <select id="getMerchant" resultMap="merchant">
+        select * from t_merchant where id=#{id}
+    </select>
+    <select id="lockMerchant" resultMap="merchant">
+        select * from t_merchant where id=#{id} for UPDATE
+    </select>
+
+    <select id="getMerchantByUserId" resultMap="merchant">
+        select * from t_merchant where user_id=#{userId}
+    </select>
+    <select id="lockMerchantByUserId" resultMap="merchant">
+        select * from t_merchant where user_id=#{userId} for UPDATE
+    </select>
+
+    <select id="getMerchantListForUser" resultMap="merchant-vo">
+        select t_merchant.*,t_merchant_coin.coin_name from t_merchant_coin join t_merchant on
+        t_merchant_coin.merchant_id=t_merchant.id
+        where t_merchant.status=0 and working_status=1 and coin_name=#{coinName} and `type` = #{type}
+        <if test="merchantName != null and merchantName.length > 0">
+            and name like CONCAT('%',#{merchantName},'%')
+        </if>
+        <if test="orderType.value==1">
+            and #{amount} <![CDATA[ <= ]]> available_balance
+        </if>
+        <if test="exceptId != null">
+            and t_merchant.id != #{exceptId}
+        </if>
+    </select>
+
+    <select id="searchMerchant" resultMap="merchant">
+        select * from t_merchant where 1=1
+        <if test="merchantName != null and merchantName.length > 0">
+            and name like CONCAT('%',#{merchantName},'%')
+        </if>
+        <if test="userId != null">
+            and user_id = userId
+        </if>
+        <if test="status != null">
+            and status=#{status}
+        </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        ORDER by add_time DESC
+    </select>
+
+    <select id="getUserMerchant" resultMap="merchant">
+        select * from t_merchant where user_id=#{userId}
+    </select>
+
+    <update id="updateMerchant">
+        update t_merchant set user_id=user_id
+        <if test="name != null and name.length > 0">
+            ,name=#{name}
+        </if>
+        <if test="email != null and email.length > 0">
+            ,email=#{email}
+        </if>
+        <if test="type != null">
+            ,`type`=#{type}
+        </if>
+        <if test="status != null">
+            ,status=#{status}
+        </if>
+        <if test="workingStatus != null">
+            ,working_status=#{workingStatus}
+        </if>
+        <if test="bankType != null">
+            ,bank_type=#{bankType.value}
+        </if>
+        <if test="bankUser != null and bankUser.length > 0">
+            ,bank_user=#{bankUser}
+        </if>
+        <if test="bankName != null and bankName.length > 0">
+            ,bank_name=#{bankName}
+        </if>
+        <if test="bankNo != null and bankNo.length > 0">
+            ,bank_no=#{bankNo}
+        </if>
+        <if test="phone != null and phone.length > 0">
+            ,phone=#{phone}
+        </if>
+        <if test="reason != null and reason.length>0">
+            ,reason=#{reason}
+        </if>
+        where id=#{id}
+    </update>
+
+    <insert id="addMerchant" useGeneratedKeys="true">
+        INSERT INTO t_merchant(`user_id`,`name`,`email`,`type`,`status`,`working_status`,`bank_type`,`phone`,
+        `bank_user`,`bank_name`,`bank_no`,`add_time`) VALUES (
+        #{userId},#{name},#{email},#{type},#{status},#{workingStatus},#{bankType.value},#{phone},
+        #{bankUser},#{bankName},#{bankNo},unix_timestamp())
+    </insert>
+
+
+    <insert id="addMerchantCoinConf">
+        insert into t_merchant_coin_conf(coin_name, cny_price, dollar_price, hkdollar_price, order_min_amount,
+        order_max_amount, fee_rate, status) values(
+        #{coinName},
+        #{cnyPrice},#{dollarPrice},#{hkdollarPrice},#{orderMinAmount},#{orderMaxAmount},#{feeRate},#{status}
+        )
+    </insert>
+    <select id="getMerchantCoinConf" resultType="com.cmd.exchange.common.model.MerchantCoinConf">
+        select * from t_merchant_coin_conf where coin_name=#{coinName}
+    </select>
+    <select id="getMerchantCoinConfById" resultType="com.cmd.exchange.common.model.MerchantCoinConf">
+        select * from t_merchant_coin_conf where id=#{id}
+    </select>
+    <select id="getMerchantCoinConfByStatus" resultMap="merchant-coin-conf">
+        select * from t_merchant_coin_conf
+        <if test="status != null">
+            where status=#{status}
+        </if>
+    </select>
+    <update id="updateMerchantCoinConf">
+        update t_merchant_coin_conf set coin_name=coin_name
+        <if test="cnyPrice != null">
+            ,cny_price=#{cnyPrice}
+        </if>
+        <if test="dollarPrice != null">
+            ,dollar_price=#{dollarPrice}
+        </if>
+        <if test="hkdollarPrice != null">
+            ,hkdollar_price=#{hkdollarPrice}
+        </if>
+        <if test="status != null">
+            ,status=#{status}
+        </if>
+        <if test="orderMinAmount != null">
+            ,order_min_amount=#{orderMinAmount}
+        </if>
+        <if test="orderMaxAmount != null">
+            ,order_max_amount=#{orderMaxAmount}
+        </if>
+        <if test="feeRate != null">
+            ,fee_rate=#{feeRate}
+        </if>
+        where id=#{id}
+    </update>
+    <delete id="delMerchantCoinConf">
+        delete from t_merchant_coin_conf where id=#{id}
+    </delete>
+
+
+    <update id="changeMerchantBalance">
+        update t_merchant_coin set available_balance=available_balance + #{changeAvailableBalance},
+        freeze_balance=freeze_balance + #{changeFreezeBalance}
+        where merchant_id=#{merchantId} and coin_name=#{coinName} and available_balance>=-#{changeAvailableBalance} and
+        freeze_balance>=-#{changeFreezeBalance}
+    </update>
+    <select id="getMerchantCoin" resultType="com.cmd.exchange.common.model.MerchantCoin">
+        select * from t_merchant_coin where merchant_id=#{merchantId} and coin_name=#{coinName}
+    </select>
+    <select id="getMerchantCoins" resultMap="merchant-coin">
+        select * from t_merchant_coin where merchant_id=#{merchantId}
+    </select>
+
+    <insert id="addMerchantCoin" parameterType="com.cmd.exchange.common.model.MerchantCoin" flushCache="true">
+        INSERT INTO t_merchant_coin(merchant_id, coin_name)
+        VALUES (#{merchantId}, #{coinName})
+    </insert>
+
+
+    <insert id="insertMerchantBill" flushCache="true">
+        insert into t_merchant_bill(merchant_id,coin_name,sub_type,reason,change_amount,last_time,comment)
+        values(#{merchantId},#{coinName},#{subType},#{reason},#{changeAmount},NOW(),#{comment})
+    </insert>
+    <select id="getMerchantBills" resultType="com.cmd.exchange.common.model.MerchantBill">
+        SELECT * from
+        t_merchant_bill
+        WHERE 1=1
+        <if test="merchantId!=null">
+            AND merchant_id = #{merchantId}
+        </if>
+        <if test="coinName!=null and coinName.length>0">
+            AND coin_name = #{coinName}
+        </if>
+        <if test="reason!=null and reason.length>0">
+            AND reason = #{reason}
+        </if>
+        <if test="beginTime!=null">
+            AND last_time >= from_unixtime(#{beginTime})
+        </if>
+        <if test="endTime!=null">
+            AND last_time <![CDATA[ < ]]> from_unixtime(#{endTime})
+        </if>
+        ORDER BY last_time DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CoinGroupConfigMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <select id="getCoinGroupConfigListByCoinName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CoinGroupConfig" flushCache="true">
+        select * from t_coin_group_config where coin_name=#{coinName}
+    </select>
+
+
+    <select id="getCionGroupConfigList" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CoinGroupConfig" flushCache="true">
+
+        select * from t_coin_group_config where 1=1
+        <if test="groupId!=null and groupId !=''">
+            and group_id=#{groupId}
+
+        </if>
+        and status = 0
+    </select>
+
+    <insert id="addCoinGroupConfig" parameterType="com.cmd.exchange.common.model.CoinGroupConfig"
+            useGeneratedKeys="true" keyProperty="id" flushCache="true">
+
+        insert into t_coin_group_config (group_id,coin_name,con_value,remark,status)
+        values (#{groupId},#{coinName},#{conValue},#{remark},#{status})
+    </insert>
+
+    <update id="updateCoinGroupConfig" parameterType="com.cmd.exchange.common.model.CoinGroupConfig" flushCache="true">
+        update t_coin_group_config set
+
+        <if test="conValue !=null and conValue!=''">
+            con_value =#{conValue},
+        </if>
+        <if test="remark!=null and remark !=''">
+            remark =#{remark},
+        </if>
+        <if test="status !=null and status !=''">
+            status = #{status},
+        </if>
+        id = id
+        where id = #{id}
+    </update>
+
+    <select id="CountCoinGroupConfigByCoinNameAndGroupId" parameterType="com.cmd.exchange.common.model.CoinGroupConfig"
+            resultType="Integer">
+        select count(*) from t_coin_group_config where coin_name =#{coinName} and group_id=#{groupId}
+    </select>
+
+    <select id="getCoinGroupConfigByCoinName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CoinGroupConfig">
+        select * from t_coin_group_config where coin_name=#{coinName}
+
+    </select>
+    <delete id="deleteCoinGroupConfigByCoinName" parameterType="String">
+        DELETE FROM t_coin_group_config where coin_name=#{coinName}
+
+    </delete>
+
+    <select id="getCoinGroupConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.CoinGroupConfig">
+        select * from t_coin_group_config where id=#{id}
+    </select>
+</mapper>

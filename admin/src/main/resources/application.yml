@@ -1,0 +1,32 @@
+#https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+## org.springframework.boot.autoconfigure.web.ServerProperties
+server:
+  port: 8099
+  #session.timeout: 2592000  # 单位: 秒. <= 30 * 24 * 60 * 60
+  tomcat:
+    uri-encoding: UTF-8
+
+
+
+##  https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+spring:
+  # http://stackoverflow.com/questions/28902374/spring-boot-rest-service-exception-handling/30193013#30193013
+  # 当找不到 handle 时. 默认会发起 response.sendError(404) --> DispatcherServlet.noHandlerFound()
+  # 配置下面两个值将会走到 ControllerAdvice 全局里面去
+  # org.springframework.boot.autoconfigure.web.WebMvcProperties
+  #  mvc.throw-exception-if-no-handler-found: false
+  # org.springframework.boot.autoconfigure.web.ResourceProperties
+  resources.add-mappings: true
+  profiles:
+    active: dev
+
+mybatis:
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  configLocation: classpath:config/mybatis-config.xml
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: false
+  supportMethodsArguments: true
+  rowBoundsWithCount: true
+  offsetAsPageNum: true

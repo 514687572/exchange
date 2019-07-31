@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.C2cDao">
+
+    <sql id="Application_columns">
+        a.id id, a.coin_name coinName, a.appl_no orderNo, b.user_name createUser,
+        a.type type, a.amount_all amount, a.price price, a.amount rAmount, a.amount_frozen mAmount, a.amount_success
+        sAmount,
+        a.status status, a.create_time createTime
+    </sql>
+    <sql id="Order_columns">
+        a.id , a.coin_name coinName, a.order_no orderNo,b.user_name buyUser, c.user_name sellUser,
+        a.price, a.amount number, a.amount*a.price amount, a.amount*a.price*a.fee_rate fee, a.finish_time finishTime,
+        a.legal_name legalName, a.status, a.upload_credential_time uploadCredentialTime,
+        case
+        when a.status = 1 and a.remark = 'deal by system' then 2
+        when a.status = 1 and a.remark != 'deal by system' then 1
+        else 0 end tag,
+        a.create_time createTime
+    </sql>
+    <sql id="Order_detail">
+        a.id id, a.order_no orderNo,
+        c.user_name sellName, c.real_name sellRealName, c.mobile sellMobile, c.email sellEmail, c.id_card sellIdCard,
+        b.user_name buyName, b.real_name buyRealName, b.mobile buyMobile, b.email buyEmail, b.id_card buyIdCard,
+        a.status status, a.appeal_role appealRole, a.appeal_desc appealDesc
+    </sql>
+
+
+    <select id="getC2cOrderDetail" parameterType="java.lang.Long"
+            resultType="com.cmd.exchange.common.vo.C2cOrderDetailVO">
+        select
+        <include refid="Order_detail"/>
+        from t_otc_order a left join t_user b on a.deposit_user_id = b.id
+        left join t_user c on a.withdrawal_user_id = c.id
+        where a.id = #{id}
+    </select>
+
+    <select id="getC2cOrders" parameterType="com.cmd.exchange.common.vo.C2cOrderVO"
+            resultType="com.cmd.exchange.common.vo.C2cOrderVO">
+        select
+        <include refid="Order_columns"/>
+        from t_otc_order a left join t_user b on a.deposit_user_id = b.id
+        left join t_user c on a.withdrawal_user_id = c.id
+        where
+        <if test="record.sellUser != null">
+            c.user_name = #{record.sellUser} and
+        </if>
+        <if test="record.buyUser != null">
+            b.user_name = #{record.buyUser} and
+        </if>
+        <if test="record.coinName != null">
+            a.coin_name = #{record.coinName} and
+        </if>
+        <if test="record.orderNo != null">
+            a.order_no = #{record.orderNo} and
+        </if>
+        <if test="record.status != 10">
+            a.status = #{record.status} and
+        </if>
+        <if test="record.startTime !=null ">
+            a.create_time <![CDATA[ >= ]]> #{record.startTime} and
+        </if>
+        <if test="record.endTime !=null ">
+            a.create_time <![CDATA[ <= ]]> #{record.endTime} and
+        </if>
+
+        1 = 1
+        order by a.create_time desc
+    </select>
+
+    <select id="downloadOrders" parameterType="com.cmd.exchange.common.vo.C2cOrderVO"
+            resultType="com.cmd.exchange.common.vo.C2cOrderVO">
+        select
+        <include refid="Order_columns"/>
+        from t_otc_order a left join t_user b on a.deposit_user_id = b.id
+        left join t_user c on a.withdrawal_user_id = c.id
+        where
+        <if test="record.sellUser != null">
+            c.user_name = #{record.sellUser} and
+        </if>
+        <if test="record.buyUser != null">
+            b.user_name = #{record.buyUser} and
+        </if>
+        <if test="record.coinName != null">
+            a.coin_name = #{record.coinName} and
+        </if>
+        <if test="record.orderNo != null">
+            a.order_no = #{record.orderNo} and
+        </if>
+        <if test="record.status != 10">
+            a.status = #{record.status} and
+        </if>
+        to_days(a.create_time) <![CDATA[>=]]> to_days(#{begin}) and
+        to_days(a.create_time) <![CDATA[<=]]> to_days(#{end})
+        order by a.create_time desc
+    </select>
+
+    <select id="getC2cApplications" parameterType="com.cmd.exchange.common.vo.C2cApplicationVO"
+            resultType="com.cmd.exchange.common.vo.C2cApplicationVO">
+        select
+        <include refid="Application_columns"/>
+        from t_otc a left join t_user b on a.user_id = b.id
+        where
+        <if test="record.type != 100">
+            a.type = #{record.type} and
+        </if>
+        <if test="record.status != 10">
+            a.status = #{record.status} and
+        </if>
+        <if test="record.coinName != null">
+            a.coin_name = #{record.coinName} and
+        </if>
+        <if test="record.orderNo != null">
+            a.appl_no = #{record.orderNo} and
+        </if>
+        <if test="record.createUser != null">
+            b.user_name like concat('%',#{record.createUser},'%') and
+        </if>
+
+
+        <if test="record.startTime !=null ">
+            b.create_time <![CDATA[ >= ]]> #{record.startTime} and
+        </if>
+        <if test="record.endTime !=null ">
+            b.create_time <![CDATA[ <= ]]> #{record.endTime} and
+        </if>
+        a.amount>0 AND a.status IN (2)
+        order by a.create_time desc
+    </select>
+
+    <select id="downloadApplications" parameterType="com.cmd.exchange.common.vo.C2cApplicationVO"
+            resultType="com.cmd.exchange.common.vo.C2cApplicationVO">
+        select
+        <include refid="Application_columns"/>
+        from t_otc a left join t_user b on a.user_id = b.id
+        where
+        <if test="record.type != 100">
+            a.type = #{record.type} and
+        </if>
+        <if test="record.status != 10">
+            a.status = #{record.status} and
+        </if>
+        <if test="record.coinName != null">
+            a.coin_name = #{record.coinName} and
+        </if>
+        <if test="record.orderNo != null">
+            a.appl_no = #{record.orderNo} and
+        </if>
+        <if test="record.createUser != null">
+            b.user_name like concat('%',#{record.createUser},'%') and
+        </if>
+        to_days(a.create_time) <![CDATA[>=]]> to_days(#{begin}) and
+        to_days(a.create_time) <![CDATA[<=]]> to_days(#{end})
+        order by a.create_time desc
+    </select>
+
+    <update id="cancelApplication" parameterType="long">
+        update t_otc
+        set status = 100, comment = 'canceled by system'
+        where
+        id = #{id}
+    </update>
+</mapper>

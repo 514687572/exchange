@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TradeLogMapper">
+
+    <resultMap type="com.cmd.exchange.common.model.TradeLog" id="orgTradeLog">
+    </resultMap>
+    <resultMap type="com.cmd.exchange.common.vo.TradeLogVo" id="tradeLog">
+        <result column="type" property="type"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <select id="getNextHasFeeTradeLog" resultMap="orgTradeLog">
+        SELECT *
+        FROM t_trade_log
+        WHERE
+        id > #{lastId} and #{endTime} > add_time and (buy_fee_coin > 0 or sell_fee_currency > 0)
+        ORDER by id ASC limit 0,1
+    </select>
+
+    <select id="getTradeLogList" resultType="com.cmd.exchange.common.vo.TradeLogVo">
+        SELECT price, amount,add_time
+        FROM t_trade_log
+        WHERE
+        coin_name = #{coinName} and settlement_currency = #{settlementCurrency}
+        ORDER by id DESC limit #{limit}
+    </select>
+
+    <select id="getTradeLogListByUser" resultMap="tradeLog">
+        SELECT * ,
+        case
+        when buy_user_id = #{userId} then 1
+        else 2
+        END type
+
+        FROM t_trade_log
+        WHERE
+
+        1 = 1
+        <if test="type == 1">
+            and buy_user_id = #{userId}
+        </if>
+        <if test="type == 2">
+            and sell_user_id = #{userId}
+        </if>
+
+        <if test="type == null">
+            and (sell_user_id = #{userId} or buy_user_id = #{userId})
+        </if>
+
+        <if test="coinName !=null and coinName.length > 0">
+            and coin_name = #{coinName}
+        </if>
+
+        <if test="settlementCurrency !=null and settlementCurrency.length > 0">
+            and settlement_currency = #{settlementCurrency}
+        </if>
+
+        ORDER by id DESC
+    </select>
+
+    <select id="getTradeLogListByTradeId" resultMap="tradeLog">
+        SELECT t.*,u.real_name, u.mobile
+        FROM t_trade_log t
+        LEFT JOIN t_user u
+        <if test="type == 1">
+            ON t.buy_user_id = u.id
+        </if>
+        <if test="type == 2">
+            ON t.sell_user_id = u.id
+        </if>
+
+        WHERE
+        <if test="type == 1">
+            t.buy_trade_id = #{tradeId}
+        </if>
+        <if test="type == 2">
+            t.sell_trade_id = #{tradeId}
+        </if>
+
+        ORDER by id DESC
+    </select>
+
+    <select id="getLatestPrice" resultType="java.math.BigDecimal">
+        select price from t_trade_log where coin_name= #{coinName} and settlement_currency = #{settlementCurrency} order
+        by id desc limit 1
+    </select>
+
+    <select id="getUserTradeResult" resultType="com.cmd.exchange.common.model.UserTradeResult">
+        select user_id,sum(total_usdt) as total_usdt from (
+        select buy_user_id as user_id,sum(price*amount) as total_usdt from t_trade_log where
+        settlement_currency=#{settlementCurrency}
+        and add_time >= #{timeBegin} and #{timeEnd} > add_time group by buy_user_id
+        union all
+        select sell_user_id as user_id,sum(price*amount) as total_usdt from t_trade_log where
+        settlement_currency=#{settlementCurrency}
+        and add_time >= #{timeBegin} and #{timeEnd} > add_time group by sell_user_id
+        ) as tmp_table group by user_id order by total_usdt desc limit 0, #{limit}
+    </select>
+
+
+</mapper>

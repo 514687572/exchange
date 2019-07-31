@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CoinConfigMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.CoinConfig" flushCache="true">
+        INSERT INTO t_coin_config(`coin_name`, transfer_fee_rate, transfer_min_amount, transfer_max_amount,
+        transfer_fee_static,transfer_fee_select, node_confirm_count )
+        VALUES (#{coinName}, #{transferFeeRate}, #{transferMinAmount}, #{transferMaxAmount}, #{transferFeeStatic},
+        #{transferFeeSelect}, #{nodeConfirmCount})
+    </insert>
+
+    <update id="updateCoinConfig" parameterType="com.cmd.exchange.common.model.CoinConfig" flushCache="true">
+        UPDATE t_coin_config
+        SET
+        <if test="transferFeeRate!=null">
+            transfer_fee_rate=#{transferFeeRate},
+        </if>
+        <if test="transferMinAmount!=null">
+            transfer_min_amount=#{transferMinAmount},
+        </if>
+        <if test="transferMaxAmount!=null">
+            transfer_max_amount=#{transferMaxAmount},
+        </if>
+        <if test="transferFeeStatic!=null">
+            transfer_fee_static=#{transferFeeStatic},
+        </if>
+        <if test="transferFeeSelect!=null">
+            transfer_fee_select=#{transferFeeSelect},
+        </if>
+        <if test="nodeConfirmCount!=null">
+            node_confirm_count=#{nodeConfirmCount},
+        </if>
+        coin_name=#{coinName}
+        WHERE coin_name=#{coinName}
+    </update>
+
+    <select id="getCoinConfigList" resultType="com.cmd.exchange.common.model.CoinConfig">
+        SELECT * FROM t_coin_config
+    </select>
+
+</mapper>

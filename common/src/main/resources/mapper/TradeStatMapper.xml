@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TradeStatMapper">
+
+
+    <select id="getCandles" resultType="com.cmd.exchange.common.vo.CandleVo">
+        SELECT
+        deal_amount as volume,
+        deal_min_price as low,
+        deal_max_price as high,
+        deal_first_price as open,
+        deal_last_price as close,
+        stat_time * 1000 as time
+
+        FROM t_trade_stat
+        WHERE
+        stat_cycle = #{minutes}
+        and coin_name = #{coinName}
+        and settlement_currency = #{settlementCurrency}
+        and stat_time <![CDATA[ >= ]]> #{startTime}
+        and stat_time <![CDATA[ < ]]> #{endTime}
+        ORDER by stat_time DESC
+    </select>
+
+
+</mapper>

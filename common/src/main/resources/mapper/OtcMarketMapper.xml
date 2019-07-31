@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcMarketMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcMarket">
+        INSERT INTO t_otc_market(coin_name, legal_name, last_price, min_exchange_num, max_exchange_num,
+        fee_rate, expired_time_cancel, expired_time_freeze, max_appl_buy_count, max_appl_sell_count, create_time)
+        VALUES (#{coinName}, #{legalName}, #{lastPrice}, #{minExchangeNum}, #{maxExchageNum},
+        #{feeRate}, #{expiredTimeCancel}, #{expiredTimeFreeze}, #{maxApplBuyCount}, #{maxApplSellCount}, NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.OtcMarket">
+        UPDATE
+        t_otc_market
+        SET
+        <if test="lastPrice!=null">last_price=#{lastPrice},</if>
+        <if test="minExchangeNum!=null">min_exchange_num=#{minExchangeNum},</if>
+        <if test="maxExchangeNum!=null">max_exchange_num=#{maxExchangeNum},</if>
+        <if test="feeRate!=null">fee_rate=#{feeRate},</if>
+        <if test="expiredTimeCancel!=null">expired_time_cancel=#{expiredTimeCancel},</if>
+        <if test="expiredTimeFreeze!=null">expired_time_freeze=#{expiredTimeFreeze},</if>
+        <if test="maxApplBuyCount!=null">max_appl_buy_count=#{maxApplBuyCount},</if>
+        <if test="maxApplSellCount!=null">max_appl_sell_count=#{maxApplSellCount},</if>
+        update_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <select id="getOtcMarket" resultType="com.cmd.exchange.common.model.OtcMarket">
+        SELECT * FROM t_otc_market
+    </select>
+
+    <select id="getOtcMarketByCoinName" resultType="com.cmd.exchange.common.model.OtcMarket">
+        SELECT * FROM t_otc_market WHERE coin_name=#{coinName}
+    </select>
+
+    <delete id="del" parameterType="int">
+        DELETE FROM t_otc_market where id=#{id}
+    </delete>
+
+
+</mapper>

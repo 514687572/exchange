@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ExchangeRateMapper">
+
+    <resultMap type="com.cmd.exchange.common.model.ExchangeRate" id="rate">
+    </resultMap>
+
+    <!--添加广告-->
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Market">
+        INSERT INTO t_exchange_rate
+        (coin_name,settlement_currency,price,price_hour_ago,comment,add_time,update_time)
+        VALUES
+        (#{coinName},#{settlementCurrency},#{price},#{priceHourAgo},#{comment},NOW(),NOW())
+    </insert>
+
+    <update id="updateExchangeRate" parameterType="com.cmd.exchange.common.model.ExchangeRate" flushCache="true">
+        UPDATE t_exchange_rate
+        SET
+        <if test="coinName != null and coinName.length > 0">
+            coin_name = #{coinName},
+        </if>
+        <if test="settlementCurrency != null and settlementCurrency.length > 0">
+            settlement_currency = #{settlementCurrency},
+        </if>
+        <if test="price != null">
+            price = #{price},
+        </if>
+        <if test="priceHourAgo != null">
+            price_hour_ago = #{priceHourAgo},
+        </if>
+        <if test="comment !=null and comment.length > 0">
+            comment =#{comment},
+        </if>
+
+        update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="getExchangeRate" resultMap="rate">
+        select * from t_exchange_rate
+        where coin_name = #{coinName} and settlement_currency = #{settlementCurrency}
+    </select>
+
+    <update id="deleteExchangeRate">
+        delete from t_exchange_rate where id = #{id}
+    </update>
+
+    <select id="getExchangeRateById" resultMap="rate">
+        select * from t_exchange_rate
+        where id = #{id}
+    </select>
+
+    <select id="getCoinExchangeRate" resultMap="rate">
+        select * from t_exchange_rate
+        where coin_name = #{coinName} || settlement_currency = #{coinName}
+    </select>
+
+    <select id="guestExchangeRate" resultType="decimal">
+        select (dst.price * src.price) as calPrice from t_exchange_rate dst, t_exchange_rate src where
+        dst.settlement_currency=src.coin_name
+        and dst.coin_name=#{coinName} and src.settlement_currency=#{settlementCurrency} limit 1
+    </select>
+
+    <select id="guestHourAgoExchangeRate" resultType="decimal">
+        select (dst.price_hour_ago * src.price_hour_ago) as calPrice from t_exchange_rate dst, t_exchange_rate src where
+        dst.settlement_currency=src.coin_name
+        and dst.price_hour_ago > 0 and src.price_hour_ago > 0
+        and dst.coin_name=#{coinName} and src.settlement_currency=#{settlementCurrency} limit 1
+    </select>
+
+
+</mapper>

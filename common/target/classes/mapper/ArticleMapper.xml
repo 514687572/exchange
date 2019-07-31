@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ArticleMapper">
+    <!-- <cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/>-->
+
+    <resultMap type="com.cmd.exchange.common.vo.ArticleVo" id="article">
+        <result column="type" property="type"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Article" flushCache="true">
+        INSERT INTO t_article(title, type, locale, content, status, creator,created_at,updated_at,display_time)
+        VALUES (#{title},
+        #{type,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        #{locale},
+        #{content},
+        #{status, typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        #{creator}, NOW(), NOW(), #{displayTime})
+    </insert>
+
+    <update id="update" parameterType="com.cmd.exchange.common.model.Article" flushCache="true">
+        UPDATE t_article
+        SET
+        <if test="title !=null and title.length >0">
+            title = #{title},
+        </if>
+
+
+        <if test="locale !=null and locale.length >0">
+            locale = #{locale},
+        </if>
+
+        <if test="content !=null and content.length >0">
+            content = #{content},
+        </if>
+        <if test="type !=null">
+            type = #{type,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        </if>
+        <if test="status !=null">
+            status = #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},
+        </if>
+        <if test="displayTime !=null">
+            display_time = #{displayTime},
+        </if>
+
+        updated_at = NOW()
+
+        WHERE id = #{id}
+
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_article WHERE id = #{id}
+    </delete>
+
+    <update id="updateStatus" parameterType="com.cmd.exchange.common.model.Article">
+        UPDATE t_article
+        set status = #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler}
+        WHERE
+        id = #{id}
+    </update>
+
+
+    <select id="getListByLocale" resultMap="article">
+        SELECT a.*,a.created_at as createTime,d.user_name as creatorName from t_article a
+        LEFT JOIN t_admin d
+        ON a.creator = d.id
+        where 1=1
+
+        <if test="locale != null">
+            and locale = #{locale}
+        </if>
+
+        <if test="type != null">
+            and a.type=#{type}
+        </if>
+
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="getActiveListByLocale" resultMap="article">
+        SELECT a.*,a.created_at as createTime from t_article a
+
+        where 1=1
+
+        <if test="locale != null">
+            and locale = #{locale}
+        </if>
+
+        <if test="type != null">
+            and a.type=#{type}
+        </if>
+
+        and status = 1
+
+        ORDER BY a.created_at DESC
+    </select>
+
+
+    <select id="getAgreement" resultMap="article">
+        SELECT * from t_article where type=4 and locale = #{locale}
+    </select>
+
+    <select id="getArticleById" resultMap="article">
+        SELECT *,created_at as createTime from t_article where id = #{articleId}
+    </select>
+
+
+</mapper>

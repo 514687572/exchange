@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.MarketGroupConfigMapper">
+    <select id="getMarketGroupConfigList" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.MarketGroupConfig">
+        select * from t_market_group_config where market_id = #{marketId}
+    </select>
+
+    <insert id="addMarketGroupConfig" parameterType="com.cmd.exchange.common.model.MarketGroupConfig"
+            useGeneratedKeys="true" keyProperty="id" flushCache="true">
+        INSERT INTO t_market_group_config(market_id ,coin_name,settlement_currency,group_id,
+        buy_con_value,sell_con_value, remark)
+        VALUES (#{marketId}, #{coinName},#{settlementCurrency},#{groupId}, #{buyConValue},#{sellConValue}, #{remark})
+    </insert>
+
+    <update id="updateMarketGroupConfigById" parameterType="com.cmd.exchange.common.model.MarketGroupConfig"
+            flushCache="true">
+        update t_market_group_config set
+        <if test="marketId!=null and marketId!=''">
+            market_id = #{marketId},
+        </if>
+        <if test="groupId !=null and groupId!=''">
+            group_id = #{groupId},
+        </if>
+        <if test="settlementCurrency !=null and settlementCurrency!=''">
+            settlement_currency = #{settlementCurrency},
+        </if>
+        <if test="coinName !=null and coinName!=''">
+            coin_name = #{coinName},
+        </if>
+        <if test="buyConValue !=null and buyConValue!=''">
+            buy_con_value = #{buyConValue},
+        </if>
+        <if test="sellConValue!=null and sellConValue!=''">
+            sell_con_value = #{sellConValue},
+        </if>
+        <if test="remark !=null and remark!=''">
+            remark = #{remark},
+        </if>
+        id =#{id}
+        where id =#{id}
+    </update>
+
+    <select id="getMarketGroupConfigListByName" parameterType="String"
+            resultType="com.cmd.exchange.common.vo.MarketGroupConfigVO">
+        select s.* from (
+        select t.*,tc.id marketGroupConfigId,tc.market_id marketId,tc.group_id groupId,tc.buy_con_value buyConValue,
+        tc.sell_con_value sellConValue,tc.remark remark,tugc.group_name groupName
+        from t_market t inner JOIN t_market_group_config tc LEFT join t_user_group_config tugc on tugc.id = tc.group_id
+        where t.id = tc.market_id
+        ) s
+        where 1=1
+
+        <if test="name!=null and name !=''">
+            and s.name like CONCAT('%',#{name},'%')
+        </if>
+
+    </select>
+    <delete id="delMarketGroupConfigById" parameterType="Integer">
+        DELETE FROM t_market_group_config where id=#{id}
+    </delete>
+
+    <select id="countMarketGroupConfigByMarketNameAndGroupId" resultType="Integer">
+        select count(*) from t_market_group_config where coin_name=#{coinName} and
+        settlement_currency=#{settlementCurrency} and group_id=#{groupId}
+    </select>
+
+    <select id="getMarketGroupConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.vo.MarketGroupConfigVO">
+        select s.* from (select t.*,tc.id marketGroupConfigId,tc.market_id marketId,tc.group_id groupId,tc.buy_con_value
+        buyConValue,
+        tc.sell_con_value sellConValue,tc.remark remark
+        from t_market t LEFT JOIN t_market_group_config tc on t.id = tc.market_id) s
+        where s.marketGroupConfigId =#{id}
+
+    </select>
+    <select id="getMarketGroupConfigListAll" resultType="com.cmd.exchange.common.model.MarketGroupConfig">
+        select * from t_market_group_config where 1=1
+
+    </select>
+</mapper>
+

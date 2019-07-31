@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TradeWarningDetailMapper">
+
+    <!--查询-->
+    <select id="getTradeWarningDetailList" resultType="com.cmd.exchange.common.model.TradeWarningDetail">
+        select * from t_trade_warning_detail where 1=1
+    </select>
+
+    <select id="getTrdeWarningDetailByWarningType" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TradeWarningDetail">
+        select * from t_trade_warning_detail where warningType = #{warningType}
+    </select>
+
+    <select id="getTradeWarningDetailById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.TradeWarningDetail">
+        select * from t_trade_warning_detail where id = #{id}
+    </select>
+
+    <select id="getTradeWarningDetailBySureType" parameterType="String"
+            resultType="com.cmd.exchange.common.model.TradeWarningDetail">
+        select * from t_trade_warning_detail where sure_type=#{sureType}
+    </select>
+
+    <!--增加大单报警信息-->
+    <insert id="addTradeWarningDetail" parameterType="com.cmd.exchange.common.model.TradeWarningDetail"
+            useGeneratedKeys="true" keyProperty="id" flushCache="true">
+        INSERT INTO t_trade_warning_detail
+        (user_id,creat_time,sure_type,trade_warning_id,audit_time,trade_log_id,warning_type)
+        values (#{userd},#{creatTime},#{sureType},#{tradeWarningId},#{auditTime},#{tradeLogId},#{warningType})
+
+    </insert>
+
+    <update id="updateTradeWarningDetail" parameterType="com.cmd.exchange.common.model.TradeWarningDetail"
+            flushCache="true">
+
+        update t_trade_warning_detail set
+        <if test="sureType !=null and sureType !=''">
+            set sure_type=#{sureType},
+        </if>
+        set audit_time = #{auditTime}
+
+        where id=#{id}
+    </update>
+
+    <delete id="deleteTradeWarningDetailById" parameterType="String" flushCache="true">
+        delete from t_trade_warning_detail where id =#{id};
+
+    </delete>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.ShareOutBonusLogMapper">
+
+    <select id="getShareOutBonusList" resultType="com.cmd.exchange.common.vo.ShareOutBonusLogVO">
+        SELECT tb.*,u.real_name,u.mobile
+        FROM t_share_out_bonus_log tb
+        LEFT JOIN t_user u
+        ON tb.user_id = u.id
+
+
+        WHERE 1 = 1
+
+        <if test="userId != null">
+            and tb.user_id = #{userId}
+        </if>
+
+        <if test="startTime != null">and tb.create_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and tb.create_time <![CDATA[ <= ]]> #{endTime}</if>
+
+        ORDER BY create_time DESC
+    </select>
+
+
+</mapper>

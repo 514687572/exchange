@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TransferUsersMapper">
+
+    <sql id="selectTransferUsers">
+        <where>
+            1=1
+
+            <if test="istransfer !=null">
+                and m.istransfer = #{istransfer}
+            </if>
+
+            <if test="identity !=null">
+                and m.identity = #{identity}
+            </if>
+            <if test="id !=null">
+                and m.id = #{id}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getOneInfo" parameterType="com.cmd.exchange.common.model.TransferUsers"
+            resultType="com.cmd.exchange.common.model.TransferUsers">
+        SELECT * FROM users as m
+
+        <include refid="selectTransferUsers"/>
+
+        ORDER BY m.id asc limit 0,1
+    </select>
+
+    <select id="getInfo" parameterType="com.cmd.exchange.common.model.TransferUsers"
+            resultType="com.cmd.exchange.common.model.TransferUsers">
+        SELECT * FROM users as m
+        <include refid="selectTransferUsers"/>
+        ORDER BY m.id asc limit 0,500
+    </select>
+
+
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.TransferUsers">
+        UPDATE users as m
+        <set>
+
+            <if test="istransfer !=null ">istransfer = #{istransfer}</if>
+
+        </set>
+              <where>m.id = #{id}</where>
+
+    </update>
+
+</mapper>
+
+

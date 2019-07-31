@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CoinDifferenceConfigMapper">
+
+    <insert id="addCoinDifferenceConfig" parameterType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        insert into t_coin_difference_config (coin_name,more_difference,less_difference,refresh_time) values
+        (#{coinName},#{moreDifference},#{lessDifference},#{refreshTime})
+    </insert>
+
+    <delete id="delCoinDifferenceConfigById">
+        delete from t_coin_difference_config where id=#{id}
+    </delete>
+
+    <update id="updateCoinDifferenceConfig" parameterType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        update t_coin_difference_config set
+        <if test="coinName !=null and coinName!=''">
+            coin_name =#{coinName},
+        </if>
+        <if test="moreDifference !=null and moreDifference!=''">
+            more_difference=#{moreDifference},
+        </if>
+        <if test="lessDifference !=null and lessDifference!=''">
+            less_difference =#{lessDifference},
+        </if>
+        <if test="refreshTime !=null and refreshTime!=''">
+            refresh_time =#{refreshTime},
+        </if>
+        id = #{id}
+        where id =#{id}
+    </update>
+
+    <select id="getCoinDifferenceConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        select * from t_coin_difference_config where id = #{id}
+    </select>
+
+    <select id="getCoinDifferenceConfigAll" resultType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        select * from t_coin_difference_config where 1=1
+    </select>
+
+    <select id="getCoinDifferenceConfigPage" resultType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        select * from t_coin_difference_config where 1=1
+    </select>
+
+    <select id="getCoinDifferenceConfigByName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CoinDifferenceConfig">
+        select * from t_coin_difference_config where coin_name = #{coinName}
+    </select>
+</mapper>

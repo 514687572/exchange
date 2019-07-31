@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserApiMapper">
+
+    <resultMap type="com.cmd.exchange.common.vo.UserApiVO" id="userApi">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <insert id="addApiKey" parameterType="com.cmd.exchange.common.model.UserApi" flushCache="true">
+        INSERT INTO t_user_api(user_id, api_key, api_secret,expired_time, white_ip_list, comment, create_time,
+        last_time,status)
+        VALUES (#{userId}, #{apiKey}, #{apiSecret}, #{expiredTime}, #{whiteIpList}, #{comment},NOW(),NOW(),
+        #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler})
+    </insert>
+
+
+    <update id="updateUserApiById" flushCache="true">
+        UPDATE t_user_api SET
+        <if test="apiKey != null and apiKey.length > 0">
+            api_key=#{apiKey} ,
+        </if>
+        <if test="apiSecret != null and apiSecret.length > 0">
+            api_secret=#{apiSecret} ,
+        </if>
+        <if test="whiteIpList != null and whiteIpList.length > 0">
+            white_ip_list=#{whiteIpList} ,
+        </if>
+        <if test="status != null">
+            status=#{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler} ,
+        </if>
+        <if test="comment != null and comment.length > 0">
+            comment=#{comment} ,
+        </if>
+        <if test="expiredTime != null">
+            expired_time=#{expiredTime} ,
+        </if>
+
+        last_time = NOW()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateUserApiStatus" flushCache="true">
+        update t_user_api
+        set status = #{status}
+        where id in
+        <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getUserApiByApiKey" resultMap="userApi">
+        SELECT * FROM t_user_api WHERE api_key = #{apiKey}
+    </select>
+
+    <select id="getApiById" resultMap="userApi">
+        SELECT * FROM t_user_api WHERE id = #{id}
+    </select>
+    <delete id="deleteApiById">
+        DELETE FROM t_user_api WHERE id = #{id}
+    </delete>
+
+
+    <select id="getUserApiList" resultMap="userApi">
+        SELECT a.*,u.mobile,u.user_name,u.real_name,u.area_code FROM t_user_api a
+        LEFT JOIN t_user u
+        ON a.user_id = u.id
+        WHERE 1=1
+        and a.status != 2
+        <if test="userId != null">
+            AND a.user_id=#{userId}
+        </if>
+        <if test="userName != null">
+            AND u.user_name=#{userName}
+        </if>
+        <if test="realName !=null">
+            and u.real_name =#{realName}
+        </if>
+        <if test="mobile !=null">
+            and u.mobile =#{mobile}
+        </if>
+        <if test="status !=null">
+            and a.status=#{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="delUserApiById">
+        delete from t_user_api where id = #{id}
+    </delete>
+</mapper>

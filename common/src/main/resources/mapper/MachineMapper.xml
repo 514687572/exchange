@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.MachineMapper">
+
+    <sql id="selectMachine">
+        <where>
+            1=1
+            <if test="machineName != null and machineName != ''">
+                and m.machine_name = #{machineName}
+            </if>
+            <if test="machineGive !=null">
+                and m.machine_give = #{machineGive}
+            </if>
+            <if test="machineType !=null and machineType gt 0">
+                and m.machine_type = #{machineType}
+            </if>
+            <if test="status !=null and status gt 0">
+                and m.status = #{status}
+            </if>
+            <if test="machineCoin != null and machineCoin != ''">
+                and m.machine_coin = #{machineCoin}
+            </if>
+
+            <if test="id !=null and id gt 0">
+                and m.id = #{id}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getOneInfo" parameterType="com.cmd.exchange.common.model.Machine"
+            resultType="com.cmd.exchange.common.model.Machine">
+        SELECT * FROM t_machine as m
+
+        <include refid="selectMachine"/>
+
+        ORDER BY m.add_time DESC limit 0, 1
+    </select>
+
+    <select id="getInfo" parameterType="com.cmd.exchange.common.model.Machine"
+            resultType="com.cmd.exchange.common.model.Machine">
+        SELECT * FROM t_machine as m
+        <include refid="selectMachine"/>
+    </select>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Machine">
+        INSERT INTO t_machine(machine_name, machine_give, machine_type, status, machine_coin, add_time)
+        VALUES (#{machineName}, #{machineGive}, #{machineType}, #{status}, #{machineCoin}, NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.Machine">
+        UPDATE t_machine as m
+        <set>
+            <if test="machineName != null and machineName != ''">m.machine_name = #{machineName}</if>
+            <if test="machineGive != null ">m.machine_give = #{machineGive}</if>
+            <if test="machineCoin != null and machineCoin != ''">m.machine_coin = #{machineCoin}</if>
+            <if test="status !=null and status gt 0">m.status = #{status}</if>
+            <if test="machineType !=null and machineType gt 0">m.machine_type = #{machineType}</if>
+            m.last_time=NOW()
+        </set>
+        <include refid="selectMachine"/>
+    </update>
+
+</mapper>
+
+

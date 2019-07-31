@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cmd.exchange.common.mapper.UserRecommendMapper" >
+  <resultMap id="BaseResultMap" type="com.cmd.exchange.common.model.UserRecommend" >
+    <id column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="pid1" property="pid1" jdbcType="INTEGER" />
+    <result column="pid2" property="pid2" jdbcType="INTEGER" />
+    <result column="pid3" property="pid3" jdbcType="INTEGER" />
+    <result column="pid4" property="pid4" jdbcType="INTEGER" />
+    <result column="pid5" property="pid5" jdbcType="INTEGER" />
+    <result column="pid6" property="pid6" jdbcType="INTEGER" />
+    <result column="pid7" property="pid7" jdbcType="INTEGER" />
+    <result column="pid8" property="pid8" jdbcType="INTEGER" />
+    <result column="pid9" property="pid9" jdbcType="INTEGER" />
+    <result column="pid10" property="pid10" jdbcType="INTEGER" />
+    <result column="pid11" property="pid11" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    user_id, pid1, pid2, pid3, pid4, pid5, pid6, pid7, pid8, pid9, pid10, pid11
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cmd.exchange.common.model.UserRecommendExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_user_recommend
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user_recommend
+    where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_user_recommend
+    where user_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cmd.exchange.common.model.UserRecommendExample" >
+    delete from t_user_recommend
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cmd.exchange.common.model.UserRecommend" >
+    insert into t_user_recommend (user_id, pid1, pid2, 
+      pid3, pid4, pid5, pid6, 
+      pid7, pid8, pid9, pid10, 
+      pid11)
+    values (#{userId,jdbcType=INTEGER}, #{pid1,jdbcType=INTEGER}, #{pid2,jdbcType=INTEGER}, 
+      #{pid3,jdbcType=INTEGER}, #{pid4,jdbcType=INTEGER}, #{pid5,jdbcType=INTEGER}, #{pid6,jdbcType=INTEGER}, 
+      #{pid7,jdbcType=INTEGER}, #{pid8,jdbcType=INTEGER}, #{pid9,jdbcType=INTEGER}, #{pid10,jdbcType=INTEGER}, 
+      #{pid11,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cmd.exchange.common.model.UserRecommend" >
+    insert into t_user_recommend
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="pid1 != null" >
+        pid1,
+      </if>
+      <if test="pid2 != null" >
+        pid2,
+      </if>
+      <if test="pid3 != null" >
+        pid3,
+      </if>
+      <if test="pid4 != null" >
+        pid4,
+      </if>
+      <if test="pid5 != null" >
+        pid5,
+      </if>
+      <if test="pid6 != null" >
+        pid6,
+      </if>
+      <if test="pid7 != null" >
+        pid7,
+      </if>
+      <if test="pid8 != null" >
+        pid8,
+      </if>
+      <if test="pid9 != null" >
+        pid9,
+      </if>
+      <if test="pid10 != null" >
+        pid10,
+      </if>
+      <if test="pid11 != null" >
+        pid11,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="pid1 != null" >
+        #{pid1,jdbcType=INTEGER},
+      </if>
+      <if test="pid2 != null" >
+        #{pid2,jdbcType=INTEGER},
+      </if>
+      <if test="pid3 != null" >
+        #{pid3,jdbcType=INTEGER},
+      </if>
+      <if test="pid4 != null" >
+        #{pid4,jdbcType=INTEGER},
+      </if>
+      <if test="pid5 != null" >
+        #{pid5,jdbcType=INTEGER},
+      </if>
+      <if test="pid6 != null" >
+        #{pid6,jdbcType=INTEGER},
+      </if>
+      <if test="pid7 != null" >
+        #{pid7,jdbcType=INTEGER},
+      </if>
+      <if test="pid8 != null" >
+        #{pid8,jdbcType=INTEGER},
+      </if>
+      <if test="pid9 != null" >
+        #{pid9,jdbcType=INTEGER},
+      </if>
+      <if test="pid10 != null" >
+        #{pid10,jdbcType=INTEGER},
+      </if>
+      <if test="pid11 != null" >
+        #{pid11,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cmd.exchange.common.model.UserRecommendExample" resultType="java.lang.Integer" >
+    select count(*) from t_user_recommend
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_user_recommend
+    <set >
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid1 != null" >
+        pid1 = #{record.pid1,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid2 != null" >
+        pid2 = #{record.pid2,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid3 != null" >
+        pid3 = #{record.pid3,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid4 != null" >
+        pid4 = #{record.pid4,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid5 != null" >
+        pid5 = #{record.pid5,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid6 != null" >
+        pid6 = #{record.pid6,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid7 != null" >
+        pid7 = #{record.pid7,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid8 != null" >
+        pid8 = #{record.pid8,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid9 != null" >
+        pid9 = #{record.pid9,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid10 != null" >
+        pid10 = #{record.pid10,jdbcType=INTEGER},
+      </if>
+      <if test="record.pid11 != null" >
+        pid11 = #{record.pid11,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_user_recommend
+    set user_id = #{record.userId,jdbcType=INTEGER},
+      pid1 = #{record.pid1,jdbcType=INTEGER},
+      pid2 = #{record.pid2,jdbcType=INTEGER},
+      pid3 = #{record.pid3,jdbcType=INTEGER},
+      pid4 = #{record.pid4,jdbcType=INTEGER},
+      pid5 = #{record.pid5,jdbcType=INTEGER},
+      pid6 = #{record.pid6,jdbcType=INTEGER},
+      pid7 = #{record.pid7,jdbcType=INTEGER},
+      pid8 = #{record.pid8,jdbcType=INTEGER},
+      pid9 = #{record.pid9,jdbcType=INTEGER},
+      pid10 = #{record.pid10,jdbcType=INTEGER},
+      pid11 = #{record.pid11,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cmd.exchange.common.model.UserRecommend" >
+    update t_user_recommend
+    <set >
+      <if test="pid1 != null" >
+        pid1 = #{pid1,jdbcType=INTEGER},
+      </if>
+      <if test="pid2 != null" >
+        pid2 = #{pid2,jdbcType=INTEGER},
+      </if>
+      <if test="pid3 != null" >
+        pid3 = #{pid3,jdbcType=INTEGER},
+      </if>
+      <if test="pid4 != null" >
+        pid4 = #{pid4,jdbcType=INTEGER},
+      </if>
+      <if test="pid5 != null" >
+        pid5 = #{pid5,jdbcType=INTEGER},
+      </if>
+      <if test="pid6 != null" >
+        pid6 = #{pid6,jdbcType=INTEGER},
+      </if>
+      <if test="pid7 != null" >
+        pid7 = #{pid7,jdbcType=INTEGER},
+      </if>
+      <if test="pid8 != null" >
+        pid8 = #{pid8,jdbcType=INTEGER},
+      </if>
+      <if test="pid9 != null" >
+        pid9 = #{pid9,jdbcType=INTEGER},
+      </if>
+      <if test="pid10 != null" >
+        pid10 = #{pid10,jdbcType=INTEGER},
+      </if>
+      <if test="pid11 != null" >
+        pid11 = #{pid11,jdbcType=INTEGER},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cmd.exchange.common.model.UserRecommend" >
+    update t_user_recommend
+    set pid1 = #{pid1,jdbcType=INTEGER},
+      pid2 = #{pid2,jdbcType=INTEGER},
+      pid3 = #{pid3,jdbcType=INTEGER},
+      pid4 = #{pid4,jdbcType=INTEGER},
+      pid5 = #{pid5,jdbcType=INTEGER},
+      pid6 = #{pid6,jdbcType=INTEGER},
+      pid7 = #{pid7,jdbcType=INTEGER},
+      pid8 = #{pid8,jdbcType=INTEGER},
+      pid9 = #{pid9,jdbcType=INTEGER},
+      pid10 = #{pid10,jdbcType=INTEGER},
+      pid11 = #{pid11,jdbcType=INTEGER}
+    where user_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <!--通过pid获取批量的用户-->
+  <select id="getBatchUserRecommend" parameterType="java.lang.Integer" resultType="com.cmd.exchange.common.model.UserRecommend">
+    select * from t_user_recommend
+    where pid1 = #{pid,jdbcType=INTEGER}
+    or pid2 = #{pid,jdbcType=INTEGER}
+    or pid3 = #{pid,jdbcType=INTEGER}
+    or pid4 = #{pid,jdbcType=INTEGER}
+    or pid5 = #{pid,jdbcType=INTEGER}
+    or pid6 = #{pid,jdbcType=INTEGER}
+    or pid7 = #{pid,jdbcType=INTEGER}
+    or pid8 = #{pid,jdbcType=INTEGER}
+    or pid9 = #{pid,jdbcType=INTEGER}
+    or pid10 = #{pid,jdbcType=INTEGER}
+  </select>
+</mapper>

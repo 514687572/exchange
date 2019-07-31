@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.TradeBonusLogMapper">
+
+    <select id="getTradeBonusList" resultType="com.cmd.exchange.common.vo.TradeBonusLogVO">
+        SELECT tb.*,u.real_name,u.mobile,u2.mobile as recommendUserMobile
+        FROM t_trade_bonus_log tb
+        LEFT JOIN t_user u
+        ON tb.user_id = u.id
+        LEFT JOIN t_user u2
+        ON tb.recommend_user_id = u2.id
+
+        WHERE 1 = 1
+
+        <if test="userId != null">
+            and tb.user_id = #{userId}
+        </if>
+        <if test="referrerId != null">
+            and tb.recommend_user_id = #{referrerId}
+        </if>
+
+        <if test="startTime != null">and tb.create_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and tb.create_time <![CDATA[ <= ]]> #{endTime}</if>
+
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getTradeBonusLog" resultType="com.cmd.exchange.common.vo.RewardLogVO">
+        SELECT t2.mobile, t2.email, t1.coin_name as coinName, t1.recommend_bonus as amount, '返佣奖励' as comment,
+        t1.create_time as lastTime
+        FROM t_trade_bonus_log t1
+        LEFT JOIN t_user t2 ON t1.recommend_user_id = t2.id
+        WHERE t1.recommend_user_id=#{userId}
+    </select>
+
+
+</mapper>

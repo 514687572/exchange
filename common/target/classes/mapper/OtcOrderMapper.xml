@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcOrderMapper">
+
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.OtcOrder" useGeneratedKeys="true" keyProperty="id"
+            flushCache="true">
+        INSERT INTO t_otc_order(
+        order_no,
+        deposit_application_id,
+        withdrawal_application_id,
+        deposit_user_id,
+        withdrawal_user_id,
+        deposit_user_name,
+        withdrawal_user_name,
+        status,
+        coin_name,
+        legal_name,
+        price,
+        amount,
+        fee_rate,
+        withdrawal_desc,
+        deposit_desc,
+        accept_time,
+        expire_time,
+        remark,
+        appeal_role,
+        appeal_desc,
+        appeal_code,
+        create_id
+        )
+        VALUES (
+        #{orderNo},
+        #{depositApplicationId},
+        #{withdrawalApplicationId},
+        #{depositUserId},
+        #{withdrawalUserId},
+        #{depositUserName},
+        #{withdrawalUserName},
+        #{status},
+        #{coinName},
+        #{legalName},
+        #{price},
+        #{amount},
+        #{feeRate},
+        #{withdrawalDesc},
+        #{depositDesc},
+        #{acceptTime},
+        #{expireTime},
+        #{remark},
+        #{appealRole},
+        #{appealDesc},
+        #{appealCode},
+        #{createId}
+        )
+    </insert>
+
+    <update id="updateApplicationOrder">
+        UPDATE t_otc_order
+        SET
+        <if test="status!=null">status=#{status},</if>
+        <if test="withdrawalDesc!=null">withdrawal_desc=#{withdrawalDesc},</if>
+        <if test="depositDesc!=null">deposit_desc=#{depositDesc},</if>
+        <if test="credentialComment!=null">credential_comment=#{credentialComment},</if>
+        <if test="credentialUrls!=null">credential_urls=#{credentialUrls},</if>
+        <if test="cancelDesc!=null">cancel_desc=#{cancelDesc},</if>
+        <if test="remark!=null">remark=#{remark},</if>
+        <if test="acceptTime!=null">accept_time=#{acceptTime},</if>
+        <if test="uploadCredentialTime!=null">upload_credential_time=#{uploadCredentialTime},</if>
+        <if test="cancelTime!=null">cancel_time=#{cancelTime},</if>
+        <if test="expireTime!=null">expire_time=#{expireTime},</if>
+        <if test="finishTime!=null">finish_time=#{finishTime},</if>
+        <if test="cancelTime!=null">cancel_time=#{cancelTime},</if>
+        <if test="appealRole!=null">appeal_role = #{appealRole},</if>
+        <if test="appealDesc!=null">appeal_desc = #{appealDesc},</if>
+        <if test="appealCode!=null">appeal_code = #{appealCode},</if>
+        <if test="createId!=null">market_user_id=#{createId},</if>
+        <if test="payType!=null">pay_type=#{payType},</if>
+        last_time=NOW()
+        WHERE
+        id=#{id}
+    </update>
+
+    <update id="setApplyRoleNull">
+        UPDATE t_otc_order SET appeal_role=NULL WHERE id=#{id}
+    </update>
+
+    <select id="getApplicationOrderById" resultType="com.cmd.exchange.common.model.OtcOrder">
+        SELECT * FROM t_otc_order WHERE id=#{id}
+    </select>
+
+    <select id="lockApplicationOrderById" resultType="com.cmd.exchange.common.model.OtcOrder">
+        SELECT * FROM t_otc_order WHERE id=#{id} for update
+    </select>
+
+    <select id="getApplicationOrderByUserId" resultType="com.cmd.exchange.common.vo.OtcOrderVO">
+        SELECT * ,
+        case when deposit_user_id = #{userId} then 1 else 2 end type
+        FROM t_otc_order
+        WHERE
+        1=1
+        <choose>
+            <when test="type!=null and type==1">
+                AND deposit_user_id=#{userId}
+            </when>
+            <when test="type!=null and type==2">
+                AND withdrawal_user_id=#{userId}
+            </when>
+            <otherwise>
+                AND (deposit_user_id=#{userId} OR withdrawal_user_id=#{userId})
+            </otherwise>
+        </choose>
+
+        <if test="coinName!=null">
+            AND coin_name=#{coinName}
+        </if>
+        <if test="status!=null and status.length>0">
+            AND status in
+            <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getApplicationOrder" resultType="com.cmd.exchange.common.model.OtcOrder">
+        SELECT * FROM t_otc_order
+        WHERE
+        1=1
+        <if test="coinName!=null">
+            AND coin_name=#{coinName}
+        </if>
+        <if test="status!=null and status.length>0">
+            AND status IN
+            <foreach collection="status" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getApplicationOrderExpire" resultType="com.cmd.exchange.common.model.OtcOrder">
+        SELECT * FROM t_otc_order
+        WHERE
+        status=#{status} AND #{now}> expire_time
+        limit 0, 100
+    </select>
+
+
+    <select id="getOtcOrderTradePass" resultType="int">
+        SELECT count(1) FROM t_otc_order
+        WHERE withdrawal_user_id=#{userId} AND coin_name=#{coinName}
+        AND status IN (1) AND create_time>DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    </select>
+    <select id="getOtcOrderTradeFail" resultType="int">
+        SELECT count(1) FROM t_otc_order
+        WHERE withdrawal_user_id=#{userId} AND coin_name=#{coinName}
+        AND status IN (100) AND create_time>DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    </select>
+    <select id="getOtcOrderAmountPass" resultType="java.math.BigDecimal">
+        SELECT sum(amount) FROM t_otc_order
+        WHERE withdrawal_user_id=#{userId} AND coin_name=#{coinName}
+        AND status IN (1) AND create_time>DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    </select>
+    <select id="getOtcOrderAmountFail" resultType="java.math.BigDecimal">
+        SELECT sum(amount) FROM t_otc_order
+        WHERE withdrawal_user_id=#{userId} AND coin_name=#{coinName}
+        AND status IN (100) AND create_time>DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    </select>
+
+</mapper>

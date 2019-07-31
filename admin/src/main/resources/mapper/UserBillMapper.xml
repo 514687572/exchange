@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.admin.dao.UserBillMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <select id="getUserRegisterReward" resultType="com.cmd.exchange.admin.vo.RegisterRewardVO">
+        SELECT tb.id,tb.coin_name,tb.change_amount as rewardAmount,
+        tb.last_time as rewardTime,u.mobile,u.real_name,u.user_name
+        FROM t_user_bill tb
+        LEFT JOIN t_user u
+        ON tb.user_id = u.id
+        WHERE reason = "Register"
+        <if test="mobile != null and mobile.length > 0">
+            and u.mobile = #{mobile}
+        </if>
+
+        <if test="startTime != null">and tb.last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and tb.last_time <![CDATA[ <= ]]> #{endTime}</if>
+
+        ORDER BY last_time DESC
+    </select>
+
+    <select id="getUserReferralRewardVO" resultType="com.cmd.exchange.admin.vo.ReferralRewardVO">
+        SELECT tb.id,tb.coin_name,tb.amount as rewardAmount,
+        tb.last_time as rewardTime,u.mobile, u2.mobile as referrerMobile,u.user_name
+
+        FROM t_user_reward_log tb
+        LEFT JOIN t_user u
+        ON tb.from = u.id
+        LEFT JOIN t_user u2
+        ON tb.user_id = u2.id
+        WHERE reason = 'Referrer'
+
+        <if test="referrer != null">
+            and tb.user_id = #{referrer}
+        </if>
+
+        <if test="userId != null">
+            and tb.from = #{userId}
+        </if>
+
+        <if test="startTime != null">and tb.last_time <![CDATA[ >= ]]> #{startTime}</if>
+        <if test="endTime != null">and tb.last_time <![CDATA[ <= ]]> #{endTime}</if>
+
+        and tb.status = 1
+        ORDER BY last_time DESC
+    </select>
+
+    <select id="getTradeRewardRec" resultType="com.cmd.exchange.admin.vo.RegisterRewardVO">
+        SELECT tb.id,tb.coin_name,tb.change_amount as rewardAmount,
+        tb.last_time as rewardTime,u.mobile,u.real_name,u.user_name
+        FROM t_user_bill tb
+        LEFT JOIN t_user u
+        ON tb.user_id = u.id
+        WHERE reason = "TxRecFe"
+        <if test="userId != null">
+            and tb.user_id = #{userId}
+        </if>
+        <if test="coinName != null and coinName.length > 0">
+            and tb.coin_name = #{coinName}
+        </if>
+
+        <if test="beginTime != null">and tb.last_time <![CDATA[ >= ]]> #{beginTime}</if>
+        <if test="endTime != null">and tb.last_time <![CDATA[ <= ]]> #{endTime}</if>
+
+        ORDER BY last_time DESC
+    </select>
+
+
+</mapper>

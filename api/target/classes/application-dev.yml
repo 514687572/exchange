@@ -1,0 +1,66 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #https://stackoverflow.com/questions/7605953/how-to-change-mysql-timezone-in-java-connection 关于时区的配置
+    url: jdbc:mysql://172.16.20.71:3306/db_fission?useLegacyDatetimeCode=false&useTimezone=true&serverTimezone=Hongkong&useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&useSSL=false
+    username: root
+    password: 'root'
+    #initial-size: 30
+  redis:
+    host: 172.16.20.71
+    database: 0
+    port: 6379
+    password:
+    jedis.pool:
+      max-idle: 50
+      max-active: 200
+      max-wait: 1000
+#sms:
+#  url: http://smssh1.253.com/msg/send/json
+#  account: CN7365137
+#  passwd: A34sCmRNOBf333
+#  ignore: false #不校验短信验证码
+
+#email:
+#  serverHost: smtp.qq.com
+#  serverPort: 465
+#  userName: noreply@coin.cn
+#  userPassword: yycdnbcsxfuqcagh
+#  fromAddress: noreply@coin.cn
+#  validate: true
+
+#sms:
+#  url: http://smssh1.253.com/msg/send/json
+#  account: N7573121
+#  passwd: IzQcShBn9r3695
+#  ignore: false #不校验短信验证码
+
+sms:
+  url: http://sms.uninets.com.cn/Modules/Interface/http/IservicesBSJY.aspx
+  account:
+  passwd:
+  ignore: false #不校验短信验证码
+  # 国外短信
+  urlGw: http://yxsms.uninets.com.cn/Modules/Interface/http/Iservicesbsjy.aspx
+  accountGw: szywgj
+  passwdGw: CML7OyrSpP
+
+email:
+  serverHost: smtp-mail.outlook.com
+  serverPort: 587
+  userName: etcoin.me@hotmail.com
+  userPassword: etcoin123
+  fromAddress: etcoin.me@hotmail.com
+  validate: true
+  starttls: true  #使用starttls加密而不是ssl加密
+
+
+########################## log ##########################
+logging:
+  config: classpath:config/log/log.xml
+  file: ./logs/api.log
+
+########################### 融云 ###########################
+rongHub:
+  appKey: 8w7jv4qb8204y
+  appSecret: pAY7dOPTR3

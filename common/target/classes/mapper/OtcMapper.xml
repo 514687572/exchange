@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.OtcMapper">
+
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.Otc" useGeneratedKeys="true" keyProperty="id"
+            flushCache="true">
+        INSERT INTO t_otc(user_id, user_name, appl_no, `type`, status, coin_name, legal_name,
+        amount, price, fee_rate, fee, amount_frozen, amount_success, amount_all, comment,
+        min_amount, max_amount)
+        VALUES (#{userId}, #{userName}, #{applNo},#{type},#{status},#{coinName},#{legalName},
+        #{amount},#{price},#{feeRate},#{fee},#{amountFrozen},#{amountSuccess},#{amountAll},#{comment},
+        #{minAmount},#{maxAmount})
+    </insert>
+
+    <update id="frozenAmount" flushCache="true">
+        UPDATE t_otc
+        SET
+        <if test="amount!=null">
+            amount=amount-#{amount},
+            amount_frozen=amount_frozen+#{amount},
+        </if>
+        last_time=NOW()
+        WHERE
+        id=#{id} AND (amount-#{amount})>=0
+    </update>
+
+    <update id="unFrozenAmount" flushCache="true">
+        UPDATE t_otc
+        SET
+        <if test="amount!=null">
+            amount=amount+#{amount},
+            amount_frozen=amount_frozen-#{amount},
+        </if>
+        last_time=NOW()
+        WHERE
+        id=#{id} AND (amount_frozen-#{amount})>=0
+    </update>
+
+    <update id="increaseAmountSuccess" flushCache="true">
+        UPDATE t_otc
+        SET
+        <if test="amount!=null">
+            amount_success=amount_success+#{amount},
+            amount_frozen=amount_frozen-#{amount},
+            status=case when (amount_frozen=0 and amount=0) then 1 else status end,
+        </if>
+        last_time=NOW()
+        WHERE id=#{id} AND (amount_frozen-#{amount})>=0
+    </update>
+
+    <update id="updateApplicationStatus" flushCache="true">
+        UPDATE t_otc
+        SET
+        <if test="status!=null">status=#{status},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <select id="getApplicationById" resultType="com.cmd.exchange.common.model.Otc">
+        SELECT * FROM t_otc WHERE id=#{id}
+    </select>
+
+    <select id="lockApplicationById" resultType="com.cmd.exchange.common.model.Otc">
+        SELECT * FROM t_otc WHERE id=#{id} for update
+    </select>
+
+    <select id="getApplicationByUserId" resultType="com.cmd.exchange.common.model.Otc">
+        SELECT * FROM t_otc
+        WHERE
+        user_id=#{userId}
+        <if test="coinName!=null">
+            AND coin_name=#{coinName}
+        </if>
+        <if test="type!=null">
+            AND `type`=#{type}
+        </if>
+        <if test="status!=null and status.length>0">
+            AND status in
+            <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND amount>0
+    </select>
+
+    <select id="getApplication" resultType="com.cmd.exchange.common.model.Otc">
+        SELECT * FROM t_otc
+        WHERE
+        1=1
+        <if test="coinName!=null">
+            AND coin_name=#{coinName}
+        </if>
+        <if test="type!=null">
+            AND `type`=#{type}
+        </if>
+        <if test="status!=null and status.length>0">
+            AND status in
+            <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND amount>0
+        order by create_time desc
+    </select>
+
+    <select id="getApplicationBuyCount" resultType="int">
+        SELECT count(1) FROM t_otc
+        WHERE user_id=#{userId} AND type=1 AND status = 2 AND coin_name = #{coinName}
+    </select>
+
+    <select id="getApplicationSellCount" resultType="int">
+        SELECT count(1) FROM t_otc
+        WHERE user_id=#{userId} AND type=2 AND status = 2 AND coin_name = #{coinName}
+    </select>
+
+</mapper>

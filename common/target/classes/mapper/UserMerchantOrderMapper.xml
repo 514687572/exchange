@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.UserMerchantOrderMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <resultMap type="com.cmd.exchange.common.model.UserMerchantOrder" id="merchant-order">
+        <result column="type" property="type" typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="status" property="status" typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+        <result column="bank_type" property="bankType"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"/>
+    </resultMap>
+
+    <select id="lockOrder" resultMap="merchant-order">
+        select * from t_user_merchant_order where id=#{id} for UPDATE
+    </select>
+    <select id="getOrder" resultMap="merchant-order">
+        select * from t_user_merchant_order where id=#{id}
+    </select>
+
+    <insert id="addOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        t_user_merchant_order(`order_no`,`type`,`coin_name`,`user_id`,`merchant_id`,`amount`,`settlement_currency`,`price`,
+        `add_time`,`fee`,`status`,`bank_type`,`bank_user`,`bank_name`,`bank_no`, `receipt_code`) VALUES (
+        #{orderNo},#{type.value},#{coinName},#{userId},#{merchantId},#{amount},#{settlementCurrency},#{price},
+        unix_timestamp(),#{fee},#{status.value},#{bankType.value},#{bankUser},#{bankName},#{bankNo},#{receiptCode} )
+    </insert>
+
+    <select id="getOrders" resultMap="merchant-order">
+        select um.*,t.user_name,m.name as merchantName from t_user_merchant_order um left join t_user t ON um.user_id =
+        t.id
+        Left join t_merchant m ON um.merchant_id = m.id
+        where 1=1
+        <if test="userId != null">
+            and um.user_id=#{userId}
+        </if>
+        <if test="merchantId != null">
+            and um.merchant_id=#{merchantId}
+        </if>
+        <if test="status != null">
+            and um.status=#{status.value}
+        </if>
+        <if test="type != null">
+            and um.type=#{type.value}
+        </if>
+        <if test="orderNo != null and orderNo.length > 0">
+            and um.order_no=#{orderNo}
+        </if>
+        ORDER BY id DESC
+    </select>
+
+    <select id="getNextTimeoutOrder" resultMap="merchant-order">
+        select * from t_user_merchant_order
+        where (status=2 and unix_timestamp() - add_time > #{timeOut})
+        or (status=3 and unix_timestamp() - accept_time > #{timeOut})
+        and id > #{lastId}
+        ORDER BY id asc limit 0,1
+    </select>
+
+    <update id="cancelOrder">
+        UPDATE t_user_merchant_order SET
+        status=100,cancel_type=#{cancelType},cancel_comment=#{cancelComment},finish_time=unix_timestamp()
+        WHERE id=#{id}
+    </update>
+
+    <update id="acceptOrder">
+        UPDATE t_user_merchant_order SET status=3,accept_time=unix_timestamp()
+        WHERE id=#{id} and status=2
+    </update>
+
+    <update id="uploadVoucher">
+        UPDATE t_user_merchant_order SET
+        status=4,proof_time=unix_timestamp(),credential_urls=#{credentialUrls},credential_comment=#{credentialComment}
+        WHERE id=#{id} and status=3
+    </update>
+
+    <update id="completeOrder">
+        UPDATE t_user_merchant_order SET status=1,finish_time=unix_timestamp()
+        WHERE id=#{id}
+    </update>
+
+    <update id="appealOrder">
+        UPDATE t_user_merchant_order SET status=5
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateOrderStatus">
+        UPDATE t_user_merchant_order SET status=#{status.value}
+        WHERE id=#{id}
+    </update>
+
+
+    <insert id="addComplaint" useGeneratedKeys="true">
+        INSERT INTO
+        t_order_complaint(`user_id`,`order_id`,`type`,`credential_urls`,`credential_comment`,`status`,`add_time` )
+        VALUES (
+        #{userId},#{orderId},#{type},#{credentialUrls},#{credentialComment},0,unix_timestamp() )
+    </insert>
+
+    <select id="getOrderComplaint" resultType="com.cmd.exchange.common.model.OrderComplaint">
+        select * from t_order_complaint where id=#{id}
+    </select>
+    <select id="lockOrderComplaint" resultType="com.cmd.exchange.common.model.OrderComplaint">
+        select * from t_order_complaint where id=#{id} FOR UPDATE
+    </select>
+    <select id="getOrderComplaintByOrder" resultType="com.cmd.exchange.common.model.OrderComplaint">
+        select * from t_order_complaint where order_id=#{orderId} and status != 2
+    </select>
+    <select id="getOrderComplaintList" resultType="com.cmd.exchange.common.model.OrderComplaint">
+        select * from t_order_complaint where 1=1
+        <if test="userId != null">
+            and `user_id`=#{userId}
+        </if>
+    </select>
+    <update id="updateComplaintStatus">
+        UPDATE t_order_complaint SET status=#{status},finish_time=unix_timestamp()
+        WHERE id=#{id}
+    </update>
+
+</mapper>

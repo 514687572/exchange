@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.DispatchJobMapper">
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.DispatchJob">
+        INSERT INTO t_dispatch_job(user_id, mobile, dispatch_no, cron_id, cron_name, coin_name, comment, amount,
+        amount_all,
+        lock_rate, free_rate, status, create_time, last_time)
+        VALUES (#{userId}, #{mobile}, #{dispatchNo}, #{cronId}, #{cronName}, #{coinName}, #{comment}, #{amount},
+        #{amountAll},
+        #{lockRate}, #{freeRate}, #{status}, NOW(), NOW())
+    </insert>
+
+    <select id="getDispatchJob" resultType="com.cmd.exchange.common.model.DispatchJob">
+        SELECT * FROM t_dispatch_job WHERE cron_id=#{jobId} AND amount>0
+    </select>
+
+    <update id="freeDispatch">
+        UPDATE t_dispatch_job SET amount=amount-#{amount} WHERE id=#{id} AND (amount-#{amount})>=0
+    </update>
+
+    <select id="getDispatchJobList" resultType="com.cmd.exchange.common.model.DispatchJob">
+        SELECT t.*,u.real_name realName,u.email eamil,u.user_name userName FROM t_dispatch_job t , t_user u where u.id =
+        t.user_id
+        <if test="realName !=null">
+            and u.real_name = #{realName}
+        </if>
+        <if test="coinName != null">
+            and t.coin_name=#{coinName}
+        </if>
+        <if test="userName">
+            and u.user_name = #{userName}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

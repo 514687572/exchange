@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.EthAddressMapper">
+    <!--cache type="com.cmd.exchange.common.utils.MybatisRedisCache"/-->
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.EthAddress" flushCache="true">
+        INSERT INTO t_eth_address(user_id, address, password, filename, credentials, create_time)
+        VALUES (#{userId}, #{address}, #{password}, #{filename}, #{credentials}, NOW())
+    </insert>
+
+    <select id="getEthAddressByUserId" resultType="com.cmd.exchange.common.model.EthAddress">
+        SELECT * FROM t_eth_address WHERE user_id=#{userId} limit 0, 1
+    </select>
+
+    <select id="getEthAddressByAddress" resultType="com.cmd.exchange.common.model.EthAddress">
+        SELECT * FROM t_eth_address WHERE address=#{address} limit 0, 1
+    </select>
+
+    <select id="getNextAddress" resultType="com.cmd.exchange.common.model.EthAddress">
+        SELECT * FROM t_eth_address WHERE id>#{id} order by id limit 0, 1
+    </select>
+
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <!-- ERROR、WARN、INFO、DEBUG -->
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="org.springframework.web" level="WARN"/>
+    <logger name="org.springframework.transaction" level="WARN"/>
+    <logger name="org.apache.shiro" level="WARN"/>
+    <logger name="org.apache.ibatis" level="WARN"/>
+    <logger name="java.sql" level="WARN"/>
+    <logger name="io.rong" level="WARN"/>
+    <logger name="org.web3j" level="INFO"/>
+    <logger name="com.cmd.exchange" level="INFO"/>
+
+</configuration>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.DispatchConfigMapper">
+
+    <resultMap type="com.cmd.exchange.common.vo.DispatchConfigVo" id="handler_status">
+        <result column="status" property="status"
+                typeHandler="com.cmd.exchange.common.enums.ValuedEnumTypeHandler"></result>
+    </resultMap>
+
+    <insert id="add" parameterType="com.cmd.exchange.common.model.DispatchConfig">
+        INSERT INTO t_dispatch_config(cron_id, cron_name, lock_name, lock_rate, free_rate, status, create_time,
+        last_time)
+        VALUES (#{cronId}, #{cronName}, #{lockName}, #{lockRate}, #{freeRate}, 0, NOW(), NOW())
+    </insert>
+
+    <insert id="adminAdd" parameterType="com.cmd.exchange.common.vo.DispatchConfigVo">
+        INSERT INTO t_dispatch_config(cron_id, cron_name, lock_name, lock_rate, free_rate, status, create_time,
+        last_time)
+        VALUES (#{cronId}, #{cronName}, #{lockName}, #{lockRate}, #{freeRate},
+        #{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler}, NOW(), NOW())
+    </insert>
+
+    <update id="mod" parameterType="com.cmd.exchange.common.model.DispatchConfig">
+        UPDATE t_dispatch_config
+        SET
+        <if test="lockName!=null">lock_name=#{lockName},</if>
+        <if test="lockRate!=null">lock_rate=#{lockRate},</if>
+        <if test="freeRate!=null">free_rate=#{freeRate},</if>
+        <if test="status!=null">status=#{status},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateDispatchConfig" parameterType="com.cmd.exchange.common.vo.DispatchConfigVo">
+        UPDATE t_dispatch_config
+        SET
+        <if test="lockName!=null">lock_name=#{lockName},</if>
+        <if test="lockRate!=null">lock_rate=#{lockRate},</if>
+        <if test="freeRate!=null">free_rate=#{freeRate},</if>
+        <if test="status!=null">status=#{status,typeHandler=com.cmd.exchange.common.enums.ValuedEnumTypeHandler},</if>
+        last_time=NOW()
+        WHERE id=#{id}
+    </update>
+
+    <delete id="del">
+        DELETE FROM t_dispatch_config WHERE id=#{id}
+    </delete>
+
+    <select id="getDispatchConfigById" resultType="com.cmd.exchange.common.model.DispatchConfig">
+        SELECT * FROM t_dispatch_config WHERE id=#{id}
+    </select>
+
+    <select id="getDispatchConfigInfoById" parameterType="int" resultMap="handler_status">
+        SELECT * FROM t_dispatch_config WHERE id=#{id}
+    </select>
+
+    <select id="getDispatchConfig" resultMap="handler_status">
+        SELECT * FROM t_dispatch_config
+    </select>
+
+</mapper>

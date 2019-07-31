@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmd.exchange.common.mapper.CashMonitoringConfigMapper">
+    <insert id="addCashMonitoringConfig" parameterType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        insert into t_cash_monitoring_config (coin_name,roll_in_number,roll_out_number) values
+        (#{coinName},#{rollInNumber},#{rollOutNumber})
+    </insert>
+
+    <update id="updateCashMonitoringConfig" parameterType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        update t_cash_monitoring_config set
+        <if test="coinName!=null and coinName!=''">
+            coin_name = #{coinName},
+        </if>
+        <if test="rollInNumber!=null and rollInNumber!=''">
+            roll_in_number = #{rollInNumber},
+        </if>
+        <if test="rollOutNumber !=null and rollOutNumber !=''">
+            roll_out_number =#{rollOutNumber},
+        </if>
+        id = #{id}
+        where id =#{id}
+    </update>
+
+    <delete id="delCashMonitoringConfigById" parameterType="Integer">
+        delete from t_cash_monitoring_config where id = #{id}
+    </delete>
+
+    <select id="getCashMonitoringConfigById" parameterType="Integer"
+            resultType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        select * from t_cash_monitoring_config where id=#{id}
+    </select>
+
+    <select id="getCashMonitoringConfigByName" parameterType="String"
+            resultType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        select * from t_cash_monitoring_config where coin_name=#{coinName}
+    </select>
+    <select id="getCashMonitoringConfigPage" resultType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        select * from t_cash_monitoring_config where 1=1
+    </select>
+
+    <select id="getCashMonitoringConfigList" resultType="com.cmd.exchange.common.model.CashMonitoringConfig">
+        select * from t_cash_monitoring_config where 1=1
+    </select>
+    <update id="updateRefreshTimeById">
+        update t_cash_monitoring_config set last_refresh_time =#{lastRefreshTime}
+    </update>
+</mapper>
