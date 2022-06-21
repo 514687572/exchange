@@ -14,7 +14,7 @@
         <java.version>1.8</java.version>
         <spring-boot.version>2.0.2.RELEASE</spring-boot.version>
         <spring.version>5.0.6.RELEASE</spring.version>
-        <mysql-connector.version>6.0.5</mysql-connector.version>
+        <mysql-connector.version>8.0.28</mysql-connector.version>
         <lombok.version>1.16.6</lombok.version>
     </properties>
 
